@@ -67,25 +67,56 @@ When running with filesystem access, the skill checks whether the other platform
 
 ## Installation
 
-### As a local skill (recommended)
+This skill is a folder you copy into your Claude skills directory. No dependencies, no build step, no terminal required.
 
-Copy the entire `claude-config-audit` folder into your skills directory:
+### Option 1: Download as ZIP (no Git needed)
 
-- **Windows**: `C:\Users\<username>\.claude\skills\`
-- **macOS/Linux**: `~/.claude/skills/`
+1. On this page, click the green **Code** button near the top right.
+2. Select **Download ZIP**.
+3. Extract the downloaded archive. You'll get a folder named `claude-config-audit-main` (or similar).
+4. Rename it to `claude-config-audit` (remove the `-main` suffix).
+5. Copy the entire folder into your Claude skills directory:
+   - **Windows**: `C:\Users\<your username>\.claude\skills\`
+   - **macOS**: `~/.claude/skills/`
+   - **Linux**: `~/.claude/skills/`
+6. If the `skills` folder doesn't exist yet, create it.
 
-The skill will be automatically available in your next Claude session.
+The final result should look like this:
 
-### Manual trigger
+```
+~/.claude/skills/claude-config-audit/
+├── SKILL.md
+└── reference/
+    ├── analysis-checks.md
+    └── report-template.md
+```
 
-If the skill doesn't trigger automatically, you can invoke it with phrases like:
+That's it. The skill will be available in your next Claude session.
+
+### Option 2: Clone with Git
+
+If you're familiar with Git, clone directly into the skills directory:
+
+```bash
+# macOS / Linux
+cd ~/.claude/skills && git clone https://github.com/paolodalprato/claude-config-audit
+
+# Windows
+cd %USERPROFILE%\.claude\skills && git clone https://github.com/paolodalprato/claude-config-audit
+```
+
+The advantage of cloning is that future updates are a single `git pull` away.
+
+### Verify the installation
+
+Start a new Claude session and ask something like:
 
 - "Audit my Claude configuration"
-- "Check my MCP servers for duplicates"
-- "Optimize my setup"
+- "Check my setup for duplicates"
 - "Is my configuration efficient?"
 - "My setup feels bloated"
-- "Which plugins should I keep?"
+
+Claude should recognize the skill and begin the audit workflow.
 
 ## Structure
 
