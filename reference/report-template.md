@@ -8,6 +8,9 @@ Adapt sections based on what was found — skip sections with no findings.
 ```markdown
 # Claude Configuration Audit — [Date]
 
+**Platform**: [detected platform: claude.ai / Chat / Cowork / Code]
+**Platforms analyzed**: [list all platforms whose configs were inspected]
+
 ## 1. System Prompt
 
 ### Current state
@@ -81,7 +84,42 @@ Adapt sections based on what was found — skip sections with no findings.
 
 ---
 
-## 5. Resource Impact Summary
+## 5. Hooks & Permissions (Code only, skip if not applicable)
+
+### Hooks ([count] configured)
+| # | Event | Command | Scope | Status |
+|---|-------|---------|-------|--------|
+[Table rows]
+
+### Permissions
+| # | Rule | Type | Status |
+|---|------|------|--------|
+[Table rows]
+
+### Issues found
+[Duplicates, stale rules, overly broad permissions]
+
+### Recommendations
+[Numbered list with rationale]
+
+---
+
+## 6. Memory Files (skip if none exist)
+
+### Current state
+- Project memory directories: [count]
+- Total memory files: [count]
+- MEMORY.md indexes: [count]
+
+### Issues found
+[Stale files, orphans, index inconsistencies]
+
+### Recommendations
+[Numbered list with rationale]
+
+---
+
+## 7. Resource Impact Summary
 
 | Metric | Current | After optimization | Savings |
 |--------|---------|-------------------|---------|
@@ -89,11 +127,13 @@ Adapt sections based on what was found — skip sections with no findings.
 | Estimated RAM | [n] MB | [n] MB | -[n] MB |
 | Enabled plugins | [n] | [n] | -[n] |
 | Skill count (loaded) | [n] | [n] | -[n] |
+| Hooks configured | [n] | [n] | -[n] |
+| Memory files | [n] | [n] | -[n] |
 | System prompt tokens | ~[n] | ~[n] | -[n]% |
 
 ---
 
-## 6. Questions for You
+## 8. Questions for You
 
 [Numbered list of decisions requiring user input]
 ```
@@ -137,6 +177,16 @@ Adapt sections based on what was found — skip sections with no findings.
 [Table rows]
 
 ### Skill Directory
+| Action | Element | Reason |
+|--------|---------|--------|
+[Table rows]
+
+### Hooks & Permissions (Code only, skip if not applicable)
+| Action | Element | Reason |
+|--------|---------|--------|
+[Table rows]
+
+### Memory Files (skip if not applicable)
 | Action | Element | Reason |
 |--------|---------|--------|
 [Table rows]

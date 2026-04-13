@@ -43,11 +43,13 @@ never in claude.ai):
 - Apply changes with backup
 - Detect OS from file paths and adapt commands accordingly
 
-**Session context only** (no filesystem tool connected — always the case
-in claude.ai, and in Claude Desktop/Cowork when no filesystem tool is
+**Session context only** (no filesystem tool connected — the case in
+claude.ai and in Claude Desktop/Cowork when no filesystem tool is
 configured):
+- claude.ai is a full environment: it has Projects (with system prompts),
+  MCP connectors, and skills — all visible in the session context
 - MCP servers and skills are visible in the session context (deferred
-  tools list, available skills list)
+  tools list, available skills list) on all platforms
 - Cannot read local config files — ask the user to paste or upload them
 - Can still analyze everything the user provides and produce a full report
 - Manual actions: provide exact file paths and content for the user to
@@ -62,6 +64,23 @@ If none are available, fall back to asking the user.
 Adapt your workflow to the available tools. Never claim you can't help
 just because you lack filesystem access — work with what you have.
 
+## Platform Compatibility Matrix
+
+What can be audited on each platform:
+
+| Layer | claude.ai | Chat | Cowork | Code (CLI & Desktop app) |
+|-------|-----------|------|--------|--------------------------|
+| System prompt | Project prompts | CLAUDE.md | User Preferences + CLAUDE.md | CLAUDE.md (global + project-level) |
+| MCP servers | Connectors (session context) | claude_desktop_config.json | claude_desktop_config.json | settings.json + .mcp.json |
+| Skills | Project skills (session context) | Local + plugin skills | Local + plugin skills | Local + plugin skills |
+| Plugins | — | — | Marketplace plugins | Marketplace plugins (settings.json) |
+| Hooks / Permissions | — | — | — | settings.json |
+| Memory files | — | — | — | ~/.claude/projects/*/memory/ |
+
+All tiers (free and paid) have access to Projects, MCP connectors, and
+skills on claude.ai. Paid tiers typically have more connectors and higher
+usage limits, but the audit scope is the same.
+
 ## Audit Workflow
 
 ### Phase 1: Data Collection
@@ -73,13 +92,16 @@ possible in parallel to save time.
 
 | File | Windows | macOS | Linux |
 |------|---------|-------|-------|
-| MCP config | `%APPDATA%\Claude\claude_desktop_config.json` | `~/Library/Application Support/Claude/claude_desktop_config.json` | `~/.config/Claude/claude_desktop_config.json` |
-| Settings | `~\.claude\settings.json` | `~/.claude/settings.json` | `~/.claude/settings.json` |
+| Desktop MCP config | `%APPDATA%\Claude\claude_desktop_config.json` | `~/Library/Application Support/Claude/claude_desktop_config.json` | `~/.config/Claude/claude_desktop_config.json` |
+| Code settings (MCP, hooks, permissions, plugins) | `~\.claude\settings.json` | `~/.claude/settings.json` | `~/.claude/settings.json` |
 | Global CLAUDE.md | `~\.claude\CLAUDE.md` | `~/.claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | Local skills | `~\.claude\skills\` | `~/.claude/skills/` | `~/.claude/skills/` |
-| Installed plugins | `~\.claude\plugins\installed_plugins.json` | `~/.claude/plugins/installed_plugins.json` | `~/.claude/plugins/installed_plugins.json` |
+| Installed plugins (metadata) | `~\.claude\plugins\installed_plugins.json` | `~/.claude/plugins/installed_plugins.json` | `~/.claude/plugins/installed_plugins.json` |
+| Project MCP (Code) | `<project>\.mcp.json` | `<project>/.mcp.json` | `<project>/.mcp.json` |
+| Project settings (Code) | `<project>\.claude\settings.json` | `<project>/.claude/settings.json` | `<project>/.claude/settings.json` |
+| Project CLAUDE.md | `<project>\CLAUDE.md` | `<project>/CLAUDE.md` | `<project>/CLAUDE.md` |
 
-**Session context to analyze** (always available in Cowork/Chat/Code):
+**Session context to analyze** (always available in claude.ai/Chat/Cowork/Code):
 - Deferred tools list → reveals all active MCP servers and connectors
 - Available skills list → reveals all loaded skills with their sources
 - System prompt content → reveals User Preferences and CLAUDE.md as injected
@@ -93,6 +115,30 @@ possible in parallel to save time.
    (proper SKILL.md + reference/ or loose files)
 4. **System Prompt**: User Preferences content, CLAUDE.md content, any
    project-level CLAUDE.md files
+5. **Claude Code settings** (only in Code — from `settings.json`):
+   - `enabledPlugins`: plugin enabled/disabled state (cross-reference with
+     `installed_plugins.json` for metadata: version, install date, marketplace)
+   - `enabledMcpjsonServers`: MCP servers enabled from project `.mcp.json` files
+   - `hooks`: shell commands triggered on events (pre/post tool calls)
+   - `permissions`: allow/deny rules for tool execution
+
+**Cross-platform detection** (when filesystem access is available):
+
+The user may have both Claude Desktop and Claude Code installed, each with
+its own configuration. Check for the other platform's config and offer to
+include it in the audit:
+
+- **If running in Claude Code**: check if `claude_desktop_config.json`
+  exists (see paths in the table above). If found, the user also has
+  Claude Desktop — offer to analyze its MCP server configuration too.
+- **If running in Claude Desktop** (with filesystem tools): check if
+  `~/.claude/settings.json` contains Code-specific keys (`hooks`,
+  `permissions`, `enabledMcpjsonServers`). If found, the user also uses
+  Claude Code — offer to analyze hooks, permissions, and Code MCP config.
+- **If running in claude.ai**: not applicable (no filesystem access).
+
+In the report, always state which platforms were analyzed so the user
+knows whether the audit covers their full setup.
 
 ### Phase 2: Analysis
 
@@ -125,7 +171,7 @@ Run these checks against the collected data. Read
 - Estimate token count for each prompt layer
 - Identify instructions referencing removed/unavailable tools
 
-**Project prompt analysis** (claude.ai — especially for free-tier users):
+**Project prompt analysis** (claude.ai — all tiers):
 - Check for instruction overlap across Project system prompts (same rules
   repeated in multiple projects)
 - Identify instructions that should be global (set once in a "General"
@@ -143,6 +189,18 @@ Run these checks against the collected data. Read
 - Check if skills reference tools/MCP servers that are no longer available
 - Detect skills that have been superseded by newer versions
 - Flag generic plugin skills that don't match the user's work profile
+
+**Hooks and permissions analysis** (Claude Code only):
+- Duplicate or conflicting hooks on the same event
+- Hooks referencing scripts or paths that don't exist
+- Overly broad permission rules (user awareness)
+- Stale permissions referencing removed MCP server tools
+
+**Memory files analysis** (Claude Code only):
+- Stale memories (files not updated in 3+ months)
+- Orphan files (not in MEMORY.md index, or index entries with missing files)
+- Project memory directories for projects that no longer exist on disk
+- MEMORY.md exceeding 200 lines (system truncation threshold)
 
 ### Phase 3: Report
 
@@ -183,10 +241,12 @@ Only after the user has approved specific actions. Always in this order:
 1. **Create backups** of every file you'll modify. Store in a timestamped
    backup directory (e.g., `~/.claude/backups/audit-YYYY-MM-DD/`).
 2. **Apply changes one category at a time**, announcing each before doing it:
-   - MCP servers (edit claude_desktop_config.json)
+   - MCP servers (edit claude_desktop_config.json and/or settings.json)
    - Plugins (edit settings.json)
    - System prompt (edit CLAUDE.md)
    - Skill folder (delete/move files)
+   - Hooks and permissions (edit settings.json — Code only)
+   - Memory files (delete stale files, update MEMORY.md — Code only)
 3. **Verify each change** — parse JSON after editing to confirm validity,
    list directories after cleanup to confirm state.
 4. **Document manual actions** — list anything you can't do that the user

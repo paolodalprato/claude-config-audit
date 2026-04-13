@@ -73,6 +73,13 @@ This happens when a plugin exists in multiple marketplaces and the user
 installed both. Keep the one from the more active/maintained source
 (typically `claude-plugins-official`).
 
+**Two data sources for plugins (Claude Code):**
+- `settings.json` → `enabledPlugins`: the enabled/disabled state (boolean per
+  plugin). This is the authoritative source for what's active.
+- `installed_plugins.json` → `plugins`: installation metadata (version,
+  install date, marketplace, git commit SHA). Use this to check for stale
+  versions, abandoned plugins, or plugins installed but no longer enabled.
+
 ### Plugin vs. local skill overlap
 Cross-reference enabled plugins with local skills in `~/.claude/skills/`.
 Common overlaps:
@@ -157,6 +164,73 @@ with the user — the original may still be needed in environments where
 the enhanced version doesn't work (e.g., agentic skills require Cowork
 subagents and won't work in Chat).
 
+## Hooks Analysis (Claude Code only)
+
+Hooks are shell commands in `settings.json` triggered on events. They run
+outside Claude's control and can affect performance and behavior.
+
+### Duplicate or overlapping hooks
+- Multiple hooks on the same event (`PreToolUse`, `PostToolUse`, etc.)
+  running similar commands (e.g., two linters on the same file types)
+- Global hooks duplicated at project level with identical commands
+
+### Broken hooks
+- Hooks referencing scripts or executables that don't exist on the system
+- Hooks referencing paths that are environment-specific (e.g., hardcoded
+  absolute paths that won't work on another machine)
+
+### Performance risk
+- Hooks with commands that may be slow (network calls, large file scans)
+  and lack a timeout — these block tool execution
+- Hooks that spawn background processes without cleanup
+
+### Conflict detection
+- Hooks that contradict each other (e.g., one hook formats code on save,
+  another reverts formatting)
+- Global hooks that conflict with project-level hooks on the same event
+
+## Permissions Analysis (Claude Code only)
+
+Permissions in `settings.json` control which tools Claude can use without
+asking for confirmation.
+
+### Overly broad rules
+- `"allow": ["Bash"]` without path or command restrictions gives Claude
+  unrestricted shell access. Flag for user awareness (not necessarily wrong,
+  but the user should know).
+- `"allow": ["Edit"]` or `"allow": ["Write"]` without path restrictions
+
+### Stale permissions
+- Allow/deny rules referencing MCP server tools that are no longer installed
+  (e.g., `mcp__old-server__tool_name` when `old-server` has been removed)
+- Rules that were added for temporary debugging and forgotten
+
+### Conflicts
+- A tool appearing in both allow and deny lists (deny takes precedence, but
+  the allow rule is dead weight)
+- Project-level permissions contradicting global permissions without clear
+  intent
+
+## Memory Files Analysis (Claude Code only)
+
+Memory files live in `~/.claude/projects/*/memory/` with an index at
+`MEMORY.md` in the same directory. They persist context across sessions.
+
+### Stale memories
+- Memory files with timestamps older than 3 months (check file modification
+  date) — may contain outdated information about the project
+- Memories referencing files, functions, or APIs that no longer exist
+
+### Orphan files
+- Memory files present in the directory but not listed in `MEMORY.md`
+- Entries in `MEMORY.md` pointing to files that no longer exist
+- Project memory directories where the associated project directory no
+  longer exists on disk
+
+### Index consistency
+- `MEMORY.md` with more than 200 lines (the system truncates beyond this)
+- Duplicate entries in `MEMORY.md` pointing to the same file
+
 ## Resource Impact Reference
 
 ### RAM estimates by server type
@@ -175,3 +249,19 @@ subagents and won't work in Chat).
 - npx installs: 2-10 seconds (package resolution + download if not cached)
 - Docker: 5-30 seconds (container startup)
 - Python with venv: 1-3 seconds
+
+### Disabling custom MCP servers
+
+Claude Desktop does NOT support toggling individual custom MCP servers
+in `claude_desktop_config.json`. All entries in the `mcpServers` object
+are loaded at startup regardless of naming. Renaming a key (e.g., adding
+an underscore prefix) does NOT disable the server — it just creates a
+server with a different name.
+
+Options for occasional-use servers:
+- **Leave enabled**: if RAM overhead is acceptable (~30-50 MB per server),
+  keep the server running. It will function automatically when its backing
+  service (e.g., Ollama, Docker) is available.
+- **Remove and re-add**: delete the entry from the JSON when not needed,
+  paste it back when needed. Keep a backup of the entry. This is the only
+  reliable way to fully disable a custom server.
