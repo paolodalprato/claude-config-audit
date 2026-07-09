@@ -36,9 +36,9 @@ The skill works on all Claude platforms, adapting its scope to what each environ
 
 | Layer | claude.ai | Chat | Cowork | Code (CLI & Desktop app) |
 |-------|-----------|------|--------|--------------------------|
-| System prompt | Project prompts | CLAUDE.md | User Preferences + CLAUDE.md | CLAUDE.md (global + project-level) |
-| MCP servers | Connectors (session context) | claude_desktop_config.json | claude_desktop_config.json | settings.json + .mcp.json |
-| Skills | Project skills (session context) | Local + plugin skills | Local + plugin skills | Local + plugin skills |
+| System prompt | Project prompts | User Preferences + Project prompts | User Preferences + CLAUDE.md | CLAUDE.md (global + project-level) |
+| MCP servers | Connectors (session context) | claude_desktop_config.json | claude_desktop_config.json | ~/.claude.json (user scope) + .mcp.json (project) |
+| Skills | Project skills (session context) | claude.ai skills (capabilities) | Local + plugin skills | Local + plugin skills |
 | Plugins | — | — | Marketplace plugins | Marketplace plugins (settings.json) |
 | Hooks / Permissions | — | — | — | settings.json |
 | Memory files | — | — | — | ~/.claude/projects/*/memory/ |
@@ -50,14 +50,15 @@ All tiers (free and paid) have access to Projects, MCP connectors, and skills on
 When running with filesystem access, the skill checks whether the other platform is also configured:
 
 - **From Claude Code**: checks if `claude_desktop_config.json` exists and offers to audit Desktop MCP servers too
-- **From Claude Desktop**: checks if `settings.json` contains Code-specific keys (hooks, permissions) and offers to audit them
+- **From Claude Desktop**: checks if `~/.claude.json` exists (user-scope MCP servers) or if `settings.json` contains Code-specific keys (hooks, permissions) and offers to audit them
 
 ## Configuration files analyzed
 
 | File | Description |
 |------|-------------|
 | `claude_desktop_config.json` | Desktop/Cowork MCP server definitions |
-| `~/.claude/settings.json` | Code settings: MCP servers, hooks, permissions, enabled plugins |
+| `~/.claude.json` | Code user-scope MCP servers (`mcpServers` key) |
+| `~/.claude/settings.json` | Code settings: hooks, permissions, enabled plugins, project-MCP approvals |
 | `~/.claude/CLAUDE.md` | Global system prompt |
 | `~/.claude/skills/` | Local skill directories |
 | `~/.claude/plugins/installed_plugins.json` | Plugin installation metadata |

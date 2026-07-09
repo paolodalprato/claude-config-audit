@@ -2,14 +2,16 @@
 name: claude-config-audit
 description: >
   Comprehensive audit and optimization of Claude configuration: MCP servers,
-  plugins, skills, and system prompt (CLAUDE.md + User Preferences). Detects
-  duplicates, unused elements, resource waste, instruction conflicts, and
-  overlapping capabilities. Produces a detailed report and interactively
-  guides cleanup. Use this skill when the user asks to "audit my setup",
-  "check my configuration", "optimize my Claude config", "clean up my MCP
-  servers", "find duplicates in my plugins", "review my CLAUDE.md", or
-  mentions wanting to improve their Claude Desktop, Cowork, or Claude Code
-  setup. Also trigger when the user says things like "my setup feels bloated",
+  plugins, skills, system prompt (CLAUDE.md + User Preferences), and — on
+  Claude Code — hooks, permissions, and memory files. Detects duplicates,
+  unused elements, resource waste, instruction conflicts, and overlapping
+  capabilities. Produces a detailed report and interactively guides cleanup.
+  Use this skill when the user asks to "audit my setup", "check my
+  configuration", "optimize my Claude config", "clean up my MCP servers",
+  "find duplicates in my plugins", "review my CLAUDE.md", "audit my hooks",
+  "review my permissions", "clean up my memory files", or mentions wanting
+  to improve their Claude Desktop, Cowork, or Claude Code setup. Also
+  trigger when the user says things like "my setup feels bloated",
   "I have too many MCP servers", "which plugins should I keep", or "is my
   configuration efficient".
 ---
@@ -70,9 +72,9 @@ What can be audited on each platform:
 
 | Layer | claude.ai | Chat | Cowork | Code (CLI & Desktop app) |
 |-------|-----------|------|--------|--------------------------|
-| System prompt | Project prompts | CLAUDE.md | User Preferences + CLAUDE.md | CLAUDE.md (global + project-level) |
-| MCP servers | Connectors (session context) | claude_desktop_config.json | claude_desktop_config.json | settings.json + .mcp.json |
-| Skills | Project skills (session context) | Local + plugin skills | Local + plugin skills | Local + plugin skills |
+| System prompt | Project prompts | User Preferences + Project prompts | User Preferences + CLAUDE.md | CLAUDE.md (global + project-level) |
+| MCP servers | Connectors (session context) | claude_desktop_config.json | claude_desktop_config.json | ~/.claude.json (user scope) + .mcp.json (project) |
+| Skills | Project skills (session context) | claude.ai skills (capabilities) | Local + plugin skills | Local + plugin skills |
 | Plugins | — | — | Marketplace plugins | Marketplace plugins (settings.json) |
 | Hooks / Permissions | — | — | — | settings.json |
 | Memory files | — | — | — | ~/.claude/projects/*/memory/ |
@@ -93,7 +95,8 @@ possible in parallel to save time.
 | File | Windows | macOS | Linux |
 |------|---------|-------|-------|
 | Desktop MCP config | `%APPDATA%\Claude\claude_desktop_config.json` | `~/Library/Application Support/Claude/claude_desktop_config.json` | `~/.config/Claude/claude_desktop_config.json` |
-| Code settings (MCP, hooks, permissions, plugins) | `~\.claude\settings.json` | `~/.claude/settings.json` | `~/.claude/settings.json` |
+| Code user MCP config (`mcpServers`) | `~\.claude.json` | `~/.claude.json` | `~/.claude.json` |
+| Code settings (hooks, permissions, plugins, project-MCP approvals) | `~\.claude\settings.json` | `~/.claude/settings.json` | `~/.claude/settings.json` |
 | Global CLAUDE.md | `~\.claude\CLAUDE.md` | `~/.claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | Local skills | `~\.claude\skills\` | `~/.claude/skills/` | `~/.claude/skills/` |
 | Installed plugins (metadata) | `~\.claude\plugins\installed_plugins.json` | `~/.claude/plugins/installed_plugins.json` | `~/.claude/plugins/installed_plugins.json` |
@@ -115,12 +118,18 @@ possible in parallel to save time.
    (proper SKILL.md + reference/ or loose files)
 4. **System Prompt**: User Preferences content, CLAUDE.md content, any
    project-level CLAUDE.md files
-5. **Claude Code settings** (only in Code — from `settings.json`):
-   - `enabledPlugins`: plugin enabled/disabled state (cross-reference with
-     `installed_plugins.json` for metadata: version, install date, marketplace)
-   - `enabledMcpjsonServers`: MCP servers enabled from project `.mcp.json` files
-   - `hooks`: shell commands triggered on events (pre/post tool calls)
-   - `permissions`: allow/deny rules for tool execution
+5. **Claude Code settings** (only in Code):
+   - `mcpServers` in `~/.claude.json`: user-scope MCP servers, added via
+     `claude mcp add`. These do NOT live in `settings.json` — an audit that
+     skips `~/.claude.json` misses them entirely
+   - `enabledPlugins` in `settings.json`: plugin enabled/disabled state
+     (cross-reference with `installed_plugins.json` for metadata: version,
+     install date, marketplace)
+   - `enabledMcpjsonServers` in `settings.json`: MCP servers enabled from
+     project `.mcp.json` files
+   - `hooks` in `settings.json`: shell commands triggered on events
+     (pre/post tool calls)
+   - `permissions` in `settings.json`: allow/deny rules for tool execution
 
 **Cross-platform detection** (when filesystem access is available):
 
@@ -132,8 +141,11 @@ include it in the audit:
   exists (see paths in the table above). If found, the user also has
   Claude Desktop — offer to analyze its MCP server configuration too.
 - **If running in Claude Desktop** (with filesystem tools): check if
+  `~/.claude.json` exists — it holds user-scope MCP servers and is the most
+  reliable signal, since Claude Code creates it on first use. Also check if
   `~/.claude/settings.json` contains Code-specific keys (`hooks`,
-  `permissions`, `enabledMcpjsonServers`). If found, the user also uses
+  `permissions`, `enabledMcpjsonServers`) — these may be absent when the
+  user has no hooks or custom permissions. If found, the user also uses
   Claude Code — offer to analyze hooks, permissions, and Code MCP config.
 - **If running in claude.ai**: not applicable (no filesystem access).
 
@@ -200,7 +212,8 @@ Run these checks against the collected data. Read
 - Stale memories (files not updated in 3+ months)
 - Orphan files (not in MEMORY.md index, or index entries with missing files)
 - Project memory directories for projects that no longer exist on disk
-- MEMORY.md exceeding 200 lines (system truncation threshold)
+- MEMORY.md exceeding the load limit — only the first 200 lines or 25 KB,
+  whichever comes first, are loaded into context
 
 ### Phase 3: Report
 

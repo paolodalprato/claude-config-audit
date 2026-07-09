@@ -228,7 +228,8 @@ Memory files live in `~/.claude/projects/*/memory/` with an index at
   longer exists on disk
 
 ### Index consistency
-- `MEMORY.md` with more than 200 lines (the system truncates beyond this)
+- `MEMORY.md` exceeding the load limit — only the first 200 lines or 25 KB,
+  whichever comes first, are loaded into context
 - Duplicate entries in `MEMORY.md` pointing to the same file
 
 ## Resource Impact Reference
