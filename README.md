@@ -2,6 +2,8 @@
 
 A Claude skill that performs comprehensive audits of your Claude configuration — MCP servers, plugins, skills, system prompt, hooks, permissions, and memory files.
 
+**Current version: 2.0.0** — see the [changelog](CHANGELOG.md).
+
 ## What it does
 
 This skill analyzes your entire Claude setup across all configuration layers and identifies:

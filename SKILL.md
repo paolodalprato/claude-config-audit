@@ -1,5 +1,6 @@
 ---
 name: claude-config-audit
+version: 2.0.0
 description: >
   Comprehensive audit and optimization of Claude configuration: MCP servers,
   plugins, skills, system prompt (CLAUDE.md + User Preferences), and — on
