@@ -3,6 +3,11 @@
 Use this structure for both the initial audit report and the final report.
 Adapt sections based on what was found — skip sections with no findings.
 
+The template is written in English but defines structure, not language:
+produce the report in the language the user is using, translating
+headings, labels, and table headers. Keep file paths, configuration keys,
+and other technical identifiers as they are.
+
 ## Initial Audit Report
 
 ```markdown

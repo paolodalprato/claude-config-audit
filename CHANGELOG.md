@@ -3,6 +3,16 @@
 All notable changes to this skill are documented in this file. The format
 is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.1] - 2026-07-10
+
+### Added
+
+- Explicit language rule: all user-facing output (markdown report, HTML
+  report, validation questions, recommendations) is written in the
+  language the user is using in the conversation. Templates define
+  structure, not language; file paths, configuration keys and technical
+  identifiers stay untranslated.
+
 ## [2.0.0] - 2026-07-10
 
 ### Added

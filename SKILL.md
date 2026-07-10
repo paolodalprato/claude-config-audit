@@ -1,6 +1,6 @@
 ---
 name: claude-config-audit
-version: 2.0.0
+version: 2.0.1
 description: >
   Comprehensive audit and optimization of Claude configuration: MCP servers,
   plugins, skills, system prompt (CLAUDE.md + User Preferences), and — on
@@ -323,6 +323,13 @@ plugin to `false` rather than removing the entry).
 actually works, not for theoretical perfection. If they use Chat and Cowork
 90% of the time, a CLI-only tool matters less. If they're a developer,
 code-oriented plugins make sense even if used occasionally.
+
+**Write in the user's language.** All user-facing output — the markdown
+report, the HTML report, validation questions, recommendations — is
+written in the language the user is using in the conversation. The
+templates are in English, but they define structure, not language:
+translate headings, labels, and table headers. Keep file paths,
+configuration keys, and technical identifiers untranslated.
 
 **Redact secrets.** When displaying configuration, always redact API keys,
 passwords, and tokens. Show only enough to identify the service

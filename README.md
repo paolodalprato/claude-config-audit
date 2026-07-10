@@ -2,7 +2,7 @@
 
 A Claude skill that performs comprehensive audits of your Claude configuration — MCP servers, plugins, skills, system prompt, hooks, permissions, and memory files.
 
-**Current version: 2.0.0** — see the [changelog](CHANGELOG.md).
+**Current version: 2.0.1** — see the [changelog](CHANGELOG.md).
 
 ## What it does
 
@@ -31,7 +31,7 @@ The audit follows a 6-phase workflow:
 
 1. **Data Collection** — reads config files, session context, and cross-platform configs. Adapts to what's available (full filesystem access, session context only, or user-provided data)
 2. **Analysis** — cross-references all layers (MCP, plugins, skills, system prompt, hooks, permissions, memory) using documented detection patterns, runs read-only health checks on MCP servers, and estimates the context cost of the configuration
-3. **Report** — structured markdown report with platform info, findings per layer, resource impact summary, recommendations, and a prioritized intervention plan; on request, also an interactive tabbed HTML version
+3. **Report** — structured markdown report with platform info, findings per layer, resource impact summary, recommendations, and a prioritized intervention plan; on request, also an interactive tabbed HTML version. Reports are written in the language you use with Claude
 4. **Interactive Validation** — asks you about each recommendation before acting (3-4 decisions at a time)
 5. **Apply Changes** — backups first, then changes one category at a time with JSON validation after each edit
 6. **Final Report** — documents everything done, manual actions remaining, restore instructions, and periodic maintenance schedule
