@@ -3,6 +3,36 @@
 All notable changes to this skill are documented in this file. The format
 is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.0] - 2026-07-11
+
+### Changed
+
+- **Scope declared: the audit covers Claude Desktop** and its three
+  environments — Chat, Cowork, and Code.
+- **The environment is the unit of analysis.** Components (files,
+  servers, skills, plugins) are verified once, but duplicates, context
+  cost, and coherence are judged per environment, where they are paid:
+  a duplicate inside one environment is a finding, the same component
+  in two environments usually is not.
+- **Stack equivalence replaces file equality** in the hierarchy
+  analysis: two global CLAUDE.md files serving different environments
+  are not copies. Expected differences that compensate a missing level
+  (e.g. User Preferences, which the Code environment never receives)
+  are declared compensation, not drift; drift is divergence in the
+  shared core. Recommended maintenance model: shared core + marked
+  compensation block.
+- Report restructured: component inventory, one section per
+  environment, cross-environment checks, intervention plan. HTML
+  template tabs follow the same structure.
+
+### Added
+
+- **Photograph rule**: the report documents the current state; no
+  comparisons with previous audits unless explicitly requested.
+- **Verification discipline**: open a folder's SKILL.md before
+  classifying it as leftover; cite the exact file and JSON key read,
+  never one reconstructed from memory.
+
 ## [2.1.0] - 2026-07-11
 
 ### Added

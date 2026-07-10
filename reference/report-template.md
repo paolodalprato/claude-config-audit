@@ -1,175 +1,132 @@
 # Report Template
 
-Use this structure for both the initial audit report and the final report.
-Adapt sections based on what was found — skip sections with no findings.
+Use this structure for both the initial audit report and the final
+report. Adapt sections based on what was found — skip sections with no
+findings.
+
+The report is a photograph of the current state: no comparisons with
+previous audits and no references to earlier reports, unless the user
+explicitly asks for a comparison.
 
 The template is written in English but defines structure, not language:
 produce the report in the language the user is using, translating
-headings, labels, and table headers. Keep file paths, configuration keys,
-and other technical identifiers as they are.
+headings, labels, and table headers. Keep file paths, configuration
+keys, and other technical identifiers as they are.
 
 ## Initial Audit Report
 
 ```markdown
-# Claude Configuration Audit — [Date]
+# Claude Desktop Configuration Audit — [Date]
 
-**Platform**: [detected platform: claude.ai / Chat / Cowork / Code]
-**Platforms analyzed**: [list all platforms whose configs were inspected]
+**Environments analyzed**: [Chat / Cowork / Code]
 
-## 1. System Prompt
+## 1. Component Inventory
 
-### Current state
-- User Preferences: [line count] lines, ~[token estimate] tokens
-- CLAUDE.md: [line count] lines, ~[token estimate] tokens
-- Overlap: [percentage]% of content duplicated between the two
+[Each component verified once, regardless of how many environments use
+it. Health from health-checks.md: OK / degraded / broken /
+misconfigured / unverifiable.]
 
-### Effective stack per platform
-| Session | Levels injected | Est. tokens |
-|---------|-----------------|-------------|
-[One row per platform the user works on — see reference/hierarchy-checks.md]
+### Instruction files
+| File / block | Level | Lines | ~Tokens |
+|--------------|-------|-------|---------|
+[User Preferences blocks, global CLAUDE.md files, project prompts]
 
-### Issues found
-[Specific duplications, contradictions, stale references; hierarchy
-findings — misplaced rules, drift between copies, coverage gaps —
-classified per reference/hierarchy-checks.md, in the order:
-contradictions and gaps, drift, misplacement]
+### MCP servers
+| # | Server | Defined in | Install | Tools | Health | Notes |
+|---|--------|-----------|---------|-------|--------|-------|
+[For context cost, mark per server whether the figure is measured,
+deferred, or assumed.]
+
+### Skills
+| # | Skill | Location | Structure | Notes |
+|---|-------|----------|-----------|-------|
+
+### Plugins
+| # | Plugin | Marketplace | Enabled | Notes |
+|---|--------|-------------|---------|-------|
+
+---
+
+## 2. Environment: Chat
+
+**Stack received**: User Preferences + active project prompt
+**MCP servers loaded**: [from claude_desktop_config.json]
+**Skills**: [account-level skills]
+
+### Issues in this environment
+[Duplicates inside this environment, context cost, unused elements]
+
+---
+
+## 3. Environment: Cowork
+
+**Stack received**: User Preferences + global CLAUDE.md + project instructions
+**MCP servers / connectors loaded**: [claude_desktop_config.json + connectors]
+**Skills and plugins**: [local skills, plugin skills, marketplace plugins]
+**Context cost**: [measured — typically the environment where bundles
+and tool schemas weigh most]
+
+### Issues in this environment
+[Duplicates inside this environment, context cost, unused elements]
+
+---
+
+## 4. Environment: Code
+
+**Stack received**: global CLAUDE.md + project CLAUDE.md (no User Preferences)
+**MCP servers loaded**: [~/.claude.json + .mcp.json + claude_desktop_config.json]
+**Hooks / permissions**: [from settings.json]
+**Memory files**: [~/.claude/projects/*/memory/]
+
+### Issues in this environment
+[Duplicates inside this environment, unused plugins, hooks and
+permissions concerns, memory hygiene]
+
+---
+
+## 5. Cross-Environment Checks
+
+### Stack equivalence and compensation
+[Differences that compensate a missing level are declared compensation,
+not drift. Drift is divergence in the shared core after subtracting
+compensations. See hierarchy-checks.md.]
+
+### Coverage gaps
+[Rules present in one environment's stack, absent where they would
+apply equally, with no compensation in place]
 
 ### Override map
 | General rule | Overridden where | Declared? |
 |--------------|------------------|-----------|
 [Informational, not issues: legitimate specializations across levels]
 
-### Recommendation
-[Consolidation strategy with rationale]
+---
+
+## 6. Resource Impact Summary
+
+| Metric | Chat | Cowork | Code |
+|--------|------|--------|------|
+| MCP servers loaded | | | |
+| MCP tools exposed | | | |
+| Estimated RAM | | | |
+| Context cost (state method per figure) | | | |
+| Skills visible | | | |
+| Plugins enabled | | | |
 
 ---
 
-## 2. MCP Servers
+## 7. Intervention Plan
 
-### Current inventory ([count] servers)
+[Consolidated list of every recommended action, ordered by convenience:
+quick wins — low difficulty, high impact — first.]
 
-| # | Server | Type | Install | Tools | Resource cost | Health |
-|---|--------|------|---------|-------|---------------|--------|
-[Table rows — Health from health-checks.md: OK / degraded / broken / misconfigured / unverifiable.
-For context cost, mark per server whether the figure is measured, deferred, or assumed.]
-
-### Issues found
-
-#### Duplicates
-[Group by functionality overlap]
-
-#### Broken or misconfigured
-[Servers failing health checks: missing paths, unresolvable packages,
-placeholder credentials — with the exact failing check for each]
-
-#### Unused/dormant
-[Servers requiring unavailable external services]
-
-#### Resource concerns
-[High-cost servers: Docker, large models, etc.]
-
-### Recommendations
-[Numbered list with rationale and expected impact for each]
-
----
-
-## 3. Plugins
-
-### Current inventory ([enabled]/[total] enabled)
-
-| # | Plugin | Source | Enabled | Status |
-|---|--------|--------|---------|--------|
-[Table rows]
-
-### Issues found
-[Duplicates, overlaps with skills, setup-only plugins]
-
-### Recommendations
-[Numbered list with rationale]
-
----
-
-## 4. Skills
-
-### Local skills ([count])
-| # | Skill | Structure | Status |
-|---|-------|-----------|--------|
-[Table rows]
-
-### Session skills ([count] from plugins/native)
-[Summary of what's loaded and from where]
-
-### Issues found
-[Duplicates, orphan files, superseded versions, irrelevant plugin skills]
-
-### Recommendations
-[Numbered list with rationale]
-
----
-
-## 5. Hooks & Permissions (Code only, skip if not applicable)
-
-### Hooks ([count] configured)
-| # | Event | Command | Scope | Status |
-|---|-------|---------|-------|--------|
-[Table rows]
-
-### Permissions
-| # | Rule | Type | Status |
-|---|------|------|--------|
-[Table rows]
-
-### Issues found
-[Duplicates, stale rules, overly broad permissions]
-
-### Recommendations
-[Numbered list with rationale]
-
----
-
-## 6. Memory Files (skip if none exist)
-
-### Current state
-- Project memory directories: [count]
-- Total memory files: [count]
-- MEMORY.md indexes: [count]
-
-### Issues found
-[Stale files, orphans, index inconsistencies]
-
-### Recommendations
-[Numbered list with rationale]
-
----
-
-## 7. Resource Impact Summary
-
-| Metric | Current | After optimization | Savings |
-|--------|---------|-------------------|---------|
-| MCP servers | [n] | [n] | -[n] |
-| MCP tools exposed | [n] | [n] | -[n] |
-| Estimated RAM | [n] MB | [n] MB | -[n] MB |
-| Estimated context cost | ~[n] tokens | ~[n] tokens | -[n]% |
-| Enabled plugins | [n] | [n] | -[n] |
-| Skill count (loaded) | [n] | [n] | -[n] |
-| Hooks configured | [n] | [n] | -[n] |
-| Memory files | [n] | [n] | -[n] |
-| System prompt tokens | ~[n] | ~[n] | -[n]% |
-
----
-
-## 8. Intervention Plan
-
-[Consolidated, cross-layer list of every recommended action, ordered by
-convenience: quick wins — low difficulty, high impact — first.]
-
-| # | Intervention | Layer | Why | Difficulty | Expected impact | Your decision needed? |
+| # | Intervention | Where | Why | Difficulty | Expected impact | Your decision needed? |
 |---|--------------|-------|-----|------------|-----------------|----------------------|
 [Table rows]
 
 **Difficulty scale**: low = single file edit or toggle, reversible in
-seconds; medium = coordinated changes across files or platforms; high =
-requires investigation, migration, or restructuring before acting.
+seconds; medium = coordinated changes across files or environments;
+high = requires investigation, migration, or restructuring before acting.
 
 **Impact**: quantify with the audit's own measurements where available
 (tokens per session, RAM, server and plugin counts); use qualitative
@@ -178,7 +135,7 @@ Never present an assumed figure as a measured one.
 
 ---
 
-## 9. Questions for You
+## 8. Questions for You
 
 [Numbered list of decisions requiring user input]
 ```

@@ -1,58 +1,49 @@
 ---
 name: claude-config-audit
-version: 2.1.0
+version: 2.2.0
 description: >
-  Comprehensive audit and optimization of Claude configuration: MCP servers,
-  plugins, skills, system prompt (CLAUDE.md + User Preferences), and — on
-  Claude Code — hooks, permissions, and memory files. Detects duplicates,
-  unused elements, resource waste, instruction conflicts, and overlapping
-  capabilities. Produces a detailed report and interactively guides cleanup.
-  Use this skill when the user asks to "audit my setup", "check my
-  configuration", "optimize my Claude config", "clean up my MCP servers",
-  "find duplicates in my plugins", "review my CLAUDE.md", "audit my hooks",
-  "review my permissions", "clean up my memory files", or mentions wanting
-  to improve their Claude Desktop, Cowork, or Claude Code setup. Also
-  trigger when the user says things like "my setup feels bloated",
-  "I have too many MCP servers", "which plugins should I keep", or "is my
-  configuration efficient".
+  Comprehensive audit and optimization of your Claude Desktop
+  configuration across its three environments — Chat, Cowork, and Code:
+  MCP servers, plugins, skills, system prompt layers (User Preferences,
+  CLAUDE.md, project instructions), hooks, permissions, and memory
+  files. Detects duplicates, unused elements, resource waste,
+  instruction conflicts, and overlapping capabilities. Produces a
+  detailed report and interactively guides cleanup. Use this skill when
+  the user asks to "audit my setup", "check my configuration", "optimize
+  my Claude config", "clean up my MCP servers", "find duplicates in my
+  plugins", "review my CLAUDE.md", "audit my hooks", "review my
+  permissions", "clean up my memory files", or mentions wanting to
+  improve their Claude Desktop setup. Also trigger when the user says
+  things like "my setup feels bloated", "I have too many MCP servers",
+  "which plugins should I keep", or "is my configuration efficient".
 ---
 
 # Claude Config Audit
 
-You are performing a comprehensive audit of the user's Claude configuration.
-Your goal is to identify inefficiencies, duplicates, conflicts, and unused
-elements across all configuration layers, then guide the user through an
-interactive cleanup process.
+You are performing a comprehensive audit of the user's Claude Desktop
+configuration, covering its three environments: Chat, Cowork, and Code.
+Your goal is to identify inefficiencies, duplicates, conflicts, and
+unused elements — analyzing each environment as the complete stack it
+actually receives — then guide the user through an interactive cleanup
+process.
 
 ## Environment Detection
 
 Before starting, determine what tools you have available. This determines
 how much you can do autonomously vs. how much you need from the user.
 
-**Key platform constraint**: claude.ai does NOT have filesystem access
-and cannot connect filesystem-related MCP servers. It works only with
-session context (deferred tools, available skills) and whatever the user
-provides in the prompt. Claude Desktop (Chat and Cowork) CAN have
-filesystem access if the user has configured tools like Desktop Commander,
-filesystem MCP, or similar. Claude Code has direct file access via its
-built-in Read/Write/Edit tools.
-
-**Full filesystem access** (Desktop Commander, filesystem MCP, or Claude
-Code with direct file access — available in Claude Desktop and Claude Code,
-never in claude.ai):
+**Full filesystem access** (Desktop Commander, filesystem MCP, or the
+Code environment with its direct file tools):
 - Read configuration files directly from the user's machine
 - List and analyze local skill directories
 - Inspect MCP server configurations
 - Apply changes with backup
 - Detect OS from file paths and adapt commands accordingly
 
-**Session context only** (no filesystem tool connected — the case in
-claude.ai and in Claude Desktop/Cowork when no filesystem tool is
-configured):
-- claude.ai is a full environment: it has Projects (with system prompts),
-  MCP connectors, and skills — all visible in the session context
-- MCP servers and skills are visible in the session context (deferred
-  tools list, available skills list) on all platforms
+**Session context only** (no filesystem tool connected):
+- MCP servers and skills are still visible in the session context
+  (deferred tools list, available skills list), and the injected system
+  prompt reveals the instruction stack of the current environment
 - Cannot read local config files — ask the user to paste or upload them
 - Can still analyze everything the user provides and produce a full report
 - Manual actions: provide exact file paths and content for the user to
@@ -67,28 +58,26 @@ If none are available, fall back to asking the user.
 Adapt your workflow to the available tools. Never claim you can't help
 just because you lack filesystem access — work with what you have.
 
-## Platform Compatibility Matrix
+## The Three Desktop Environments
 
-What can be audited on each platform:
+The audit covers Claude Desktop and treats each of its environments as
+a complete stack — what a session there actually receives:
 
-| Layer | claude.ai | Chat | Cowork | Code (CLI & Desktop app) |
-|-------|-----------|------|--------|--------------------------|
-| System prompt | Project prompts | User Preferences + Project prompts | User Preferences + CLAUDE.md | CLAUDE.md (global + project-level) |
-| MCP servers | Connectors (session context) | claude_desktop_config.json | claude_desktop_config.json | ~/.claude.json (user scope) + .mcp.json (project) |
-| Skills | Project skills (session context) | claude.ai skills (capabilities) | Local + plugin skills | Local + plugin skills |
-| Plugins | — | — | Marketplace plugins | Marketplace plugins (settings.json) |
-| Hooks / Permissions | — | — | — | settings.json |
-| Memory files | — | — | — | ~/.claude/projects/*/memory/ |
+| Layer | Chat | Cowork | Code |
+|-------|------|--------|------|
+| System prompt | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
+| MCP servers | claude_desktop_config.json | claude_desktop_config.json + connectors | ~/.claude.json (user scope) + .mcp.json (project) + claude_desktop_config.json |
+| Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
+| Plugins | — | Marketplace plugins | Marketplace plugins (settings.json) |
+| Hooks / Permissions | — | — | settings.json |
+| Memory files | — | — | ~/.claude/projects/*/memory/ |
 
-All tiers (free and paid) have access to Projects, MCP connectors, and
-skills on claude.ai. Paid tiers typically have more connectors and higher
-usage limits, but the audit scope is the same.
-
-The Code column covers both frontends — the CLI and the Code tab in the
-Desktop app. They share instruction files, settings, skills and plugins,
-but diverge on MCP sources: the Desktop-app tab also loads servers from
-`claude_desktop_config.json`, the standalone CLI does not (unless
-imported via `claude mcp add-from-claude-desktop`).
+Components are shared across environments (the same server definition
+can feed more than one environment), so verify each component once, but
+judge duplicates, context cost, and coherence per environment: a
+duplicate inside one environment is paid in every session there, while
+the same component appearing in two different environments is usually
+legitimate.
 
 ## Audit Workflow
 
@@ -111,7 +100,7 @@ possible in parallel to save time.
 | Project settings (Code) | `<project>\.claude\settings.json` | `<project>/.claude/settings.json` | `<project>/.claude/settings.json` |
 | Project CLAUDE.md | `<project>\CLAUDE.md` | `<project>/CLAUDE.md` | `<project>/CLAUDE.md` |
 
-**Session context to analyze** (always available in claude.ai/Chat/Cowork/Code):
+**Session context to analyze** (always available):
 - Deferred tools list → reveals all active MCP servers and connectors
 - Available skills list → reveals all loaded skills with their sources
 - System prompt content → reveals User Preferences and CLAUDE.md as injected
@@ -138,26 +127,10 @@ possible in parallel to save time.
      (pre/post tool calls)
    - `permissions` in `settings.json`: allow/deny rules for tool execution
 
-**Cross-platform detection** (when filesystem access is available):
-
-The user may have both Claude Desktop and Claude Code installed, each with
-its own configuration. Check for the other platform's config and offer to
-include it in the audit:
-
-- **If running in Claude Code**: check if `claude_desktop_config.json`
-  exists (see paths in the table above). If found, the user also has
-  Claude Desktop — offer to analyze its MCP server configuration too.
-- **If running in Claude Desktop** (with filesystem tools): check if
-  `~/.claude.json` exists — it holds user-scope MCP servers and is the most
-  reliable signal, since Claude Code creates it on first use. Also check if
-  `~/.claude/settings.json` contains Code-specific keys (`hooks`,
-  `permissions`, `enabledMcpjsonServers`) — these may be absent when the
-  user has no hooks or custom permissions. If found, the user also uses
-  Claude Code — offer to analyze hooks, permissions, and Code MCP config.
-- **If running in claude.ai**: not applicable (no filesystem access).
-
-In the report, always state which platforms were analyzed so the user
-knows whether the audit covers their full setup.
+**Scope**: audit all three environments by default — the configuration
+files of Chat, Cowork, and Code all live on the same machine. In the
+report, always state which environments were analyzed so the user knows
+whether the audit covers their full setup.
 
 ### Phase 2: Analysis
 
@@ -166,6 +139,14 @@ Run these checks against the collected data. Read
 `reference/health-checks.md` for the operational verification of MCP
 servers, and `reference/hierarchy-checks.md` for the instruction
 hierarchy analysis.
+
+Structure the analysis in two passes. First the **component inventory**:
+verify each component (config file, MCP server, skill, plugin) exactly
+once, regardless of how many environments use it. Then the **environment
+assembly**: for each of the three environments, reconstruct the stack it
+receives and judge duplicates, context cost, and unused elements there —
+that is where they are paid. Cross-environment checks (stack
+equivalence, compensation, coverage gaps) come last.
 
 **Cross-layer duplicate detection:**
 - MCP servers providing the same functionality (e.g., two reasoning servers,
@@ -211,19 +192,20 @@ hierarchy analysis.
 - Estimate token count for each prompt layer
 - Identify instructions referencing removed/unavailable tools
 
-**Instruction hierarchy analysis** (all platforms):
-- Reconstruct the effective stack each platform receives: which levels,
-  in what order, at what measured token cost — including the fact that
-  Claude Code never sees User Preferences, and the MCP-source asymmetry
-  between the Code CLI and the Desktop-app Code tab
-- Classify every cross-level difference with the four-outcome taxonomy:
-  misplacement, drift, coverage gap, presumed specialization. Detection
-  tests in `reference/hierarchy-checks.md`
+**Instruction hierarchy analysis** (cross-environment):
+- Reconstruct the effective stack each environment receives: which
+  levels, in what order, at what measured token cost — including the
+  fact that the Code environment never sees User Preferences
+- The unit of comparison is the stack, not the file: two global
+  CLAUDE.md files serving different environments are not copies, and
+  their expected differences (declared compensation for a missing
+  level) are not drift. Taxonomy and tests in
+  `reference/hierarchy-checks.md`
 - Differences that pass the rewrite test ("in general X, but in this
   context Y") are specialization, not findings: they go to the override
   map, and ambiguous cases become validation questions
 
-**Project prompt analysis** (claude.ai — all tiers):
+**Project prompt analysis**:
 - Check for instruction overlap across Project system prompts (same rules
   repeated in multiple projects)
 - Identify instructions that should be global (set once in a "General"
@@ -260,14 +242,16 @@ hierarchy analysis.
 Produce a structured report. Read `reference/report-template.md` for the
 format. The report should include:
 
-1. **Current state summary** — counts for each layer (MCP, plugins, skills)
-2. **Issues found** — grouped by severity (duplicates, unused, conflicts,
-   resource concerns)
-3. **Recommended actions** — each with clear rationale and expected impact
-4. **Intervention plan** — one consolidated cross-layer table: every
-   action with its explanation, difficulty (low / medium / high) and
-   expected impact, ordered so quick wins come first. Scale definitions
-   in `reference/report-template.md`
+1. **Component inventory** — every config file, MCP server, skill and
+   plugin, each verified once, with health status
+2. **One section per environment** (Chat, Cowork, Code) — the stack it
+   receives, its context cost, its internal duplicates and unused elements
+3. **Cross-environment checks** — stack equivalence, declared
+   compensations, coverage gaps, override map
+4. **Intervention plan** — one consolidated table: every action with its
+   explanation, difficulty (low / medium / high) and expected impact,
+   ordered so quick wins come first. Scale definitions in
+   `reference/report-template.md`
 5. **Questions for the user** — anything that requires their input to decide
 
 After delivering the markdown report, offer an interactive HTML version:
@@ -340,8 +324,17 @@ plugin to `false` rather than removing the entry).
 
 **Respect the user's workflow.** The audit should optimize for how the user
 actually works, not for theoretical perfection. If they use Chat and Cowork
-90% of the time, a CLI-only tool matters less. If they're a developer,
+90% of the time, a Code-only tool matters less. If they're a developer,
 code-oriented plugins make sense even if used occasionally.
+
+**The report is a photograph.** Document the current state only. Never
+compare with previous audits or reference earlier reports unless the
+user explicitly asks for a comparison.
+
+**Verify before classifying.** Before labeling a folder as leftover or
+orphaned, open its SKILL.md (or main file) and read it. When reporting
+the location of a finding, cite the exact file and JSON key you read,
+never one reconstructed from memory.
 
 **Write in the user's language.** All user-facing output — the markdown
 report, the HTML report, validation questions, recommendations — is

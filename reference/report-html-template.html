@@ -5,8 +5,8 @@
   - Replace every {{PLACEHOLDER}} with content from the markdown report.
   - Write all visible content in the user's language; translate the tab
     labels and table headers too.
-  - Remove the <button> and matching <section> of any layer that does not
-    apply to the audited platform (e.g. hooks/memory outside Claude Code).
+  - Remove the <button> and matching <section> of any environment that
+    was not analyzed.
   - Section content is plain HTML: use <table> for inventories, <p> for
     narrative, the .pill classes for statuses (ok / warn / bad) and
     difficulty (ok=low, warn=medium, bad=high).
@@ -77,12 +77,11 @@
 </header>
 <nav id="tabs">
   <button data-tab="overview" class="active">{{TAB_OVERVIEW}}</button>
-  <button data-tab="prompt">{{TAB_PROMPT}}</button>
-  <button data-tab="mcp">{{TAB_MCP}}</button>
-  <button data-tab="plugins">{{TAB_PLUGINS}}</button>
-  <button data-tab="skills">{{TAB_SKILLS}}</button>
-  <button data-tab="hooks">{{TAB_HOOKS}}</button>
-  <button data-tab="memory">{{TAB_MEMORY}}</button>
+  <button data-tab="components">{{TAB_COMPONENTS}}</button>
+  <button data-tab="chat">{{TAB_CHAT}}</button>
+  <button data-tab="cowork">{{TAB_COWORK}}</button>
+  <button data-tab="code">{{TAB_CODE}}</button>
+  <button data-tab="cross">{{TAB_CROSS}}</button>
   <button data-tab="plan">{{TAB_PLAN}}</button>
 </nav>
 <main>
@@ -97,17 +96,23 @@
     {{OVERVIEW_SUMMARY}}
   </section>
 
-  <section class="tab" id="tab-prompt">{{PROMPT_CONTENT}}</section>
-  <section class="tab" id="tab-mcp">
-    <!-- MCP inventory with Health pills: ok=OK, warn=degraded/unverifiable,
-         bad=broken/misconfigured. Mark context cost per server as
-         measured / deferred / assumed. -->
-    {{MCP_CONTENT}}
+  <section class="tab" id="tab-components">
+    <!-- Component inventory: instruction files, MCP servers (Health
+         pills: ok=OK, warn=degraded/unverifiable, bad=broken/
+         misconfigured; mark context cost per server as measured /
+         deferred / assumed), skills, plugins. Each verified once. -->
+    {{COMPONENTS_CONTENT}}
   </section>
-  <section class="tab" id="tab-plugins">{{PLUGINS_CONTENT}}</section>
-  <section class="tab" id="tab-skills">{{SKILLS_CONTENT}}</section>
-  <section class="tab" id="tab-hooks">{{HOOKS_CONTENT}}</section>
-  <section class="tab" id="tab-memory">{{MEMORY_CONTENT}}</section>
+  <!-- One tab per environment: the stack it receives, its context
+       cost, its internal duplicates and unused elements. -->
+  <section class="tab" id="tab-chat">{{CHAT_CONTENT}}</section>
+  <section class="tab" id="tab-cowork">{{COWORK_CONTENT}}</section>
+  <section class="tab" id="tab-code">{{CODE_CONTENT}}</section>
+  <section class="tab" id="tab-cross">
+    <!-- Cross-environment checks: stack equivalence, declared
+         compensations, coverage gaps, override map. -->
+    {{CROSS_CONTENT}}
+  </section>
   <section class="tab" id="tab-plan">
     <!-- Intervention plan table: # | intervention | layer | why |
          difficulty (pill: ok=low, warn=medium, bad=high) | expected

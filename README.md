@@ -1,8 +1,8 @@
 # claude-config-audit
 
-A Claude skill that performs comprehensive audits of your Claude configuration — MCP servers, plugins, skills, system prompt, hooks, permissions, and memory files.
+A Claude skill that performs comprehensive audits of your Claude Desktop configuration across its three environments — Chat, Cowork, and Code: MCP servers, plugins, skills, system prompt layers, hooks, permissions, and memory files.
 
-**Current version: 2.1.0** — see the [changelog](CHANGELOG.md).
+**Current version: 2.2.0** — see the [changelog](CHANGELOG.md).
 
 ## What it does
 
@@ -14,15 +14,15 @@ This skill analyzes your entire Claude setup across all configuration layers and
 - **Broken servers** — read-only health checks: missing script paths, unresolvable npx packages, placeholder credentials, backing services (Docker, Ollama) not running
 - **Context cost** — tokens injected in every session by MCP tool schemas, skill descriptions, and server instruction blocks, with deferred-loading awareness
 - **Intervention plan** — every recommendation consolidated in one cross-layer table with explanation, difficulty, and expected impact, quick wins first
-- **Interactive HTML report** (optional) — a self-contained tabbed page, one tab per layer plus the intervention plan, sortable tables, no external dependencies
+- **Interactive HTML report** (optional) — a self-contained tabbed page, one tab per environment plus the intervention plan, sortable tables, no external dependencies
 - **System prompt bloat** — instructions duplicated between User Preferences and CLAUDE.md, stale references to removed tools
-- **Instruction hierarchy** — the effective configuration stack each platform receives, rules placed at the wrong level, drift between config copies, coverage gaps, and an override map separating real conflicts from legitimate per-project specialization
-- **Project prompt overlap** (claude.ai) — same rules repeated across multiple Projects
+- **Instruction hierarchy** — the effective stack each environment receives, rules placed at the wrong level, drift in the shared core between environment configs, declared compensations, coverage gaps, and an override map separating real conflicts from legitimate specialization
+- **Project prompt overlap** — same rules repeated across multiple Projects
 - **Skill ecosystem issues** — orphan files, superseded versions, plugin-vs-local-skill duplicates
 - **Plugin duplicates** — same plugin from multiple marketplaces, installed-but-never-enabled plugins, two data sources cross-referenced (`enabledPlugins` + `installed_plugins.json`)
 - **Hooks and permissions issues** (Claude Code) — duplicate or conflicting hooks, overly broad permissions, stale rules referencing removed tools
 - **Memory file hygiene** (Claude Code) — stale memories, orphan files, index inconsistencies
-- **Cross-platform gaps** — detects if you have both Claude Desktop and Claude Code configured, and offers to audit both
+- **Per-environment analysis** — each environment audited as the complete stack it receives; duplicates and context cost judged where they are paid: a duplicate inside one environment is a finding, the same component in two environments usually is not
 
 It then guides you through an interactive cleanup, creating backups before any change.
 
@@ -30,36 +30,27 @@ It then guides you through an interactive cleanup, creating backups before any c
 
 The audit follows a 6-phase workflow:
 
-1. **Data Collection** — reads config files, session context, and cross-platform configs. Adapts to what's available (full filesystem access, session context only, or user-provided data)
-2. **Analysis** — cross-references all layers (MCP, plugins, skills, system prompt, hooks, permissions, memory) using documented detection patterns, runs read-only health checks on MCP servers, and estimates the context cost of the configuration
-3. **Report** — structured markdown report with platform info, findings per layer, resource impact summary, recommendations, and a prioritized intervention plan; on request, also an interactive tabbed HTML version. Reports are written in the language you use with Claude
+1. **Data Collection** — reads config files and session context. Adapts to what's available (full filesystem access, session context only, or user-provided data)
+2. **Analysis** — verifies each component once, then analyzes each environment (Chat, Cowork, Code) as the complete stack it receives: internal duplicates, measured context cost, unused elements, plus cross-environment checks and read-only health checks on MCP servers
+3. **Report** — structured markdown report with a component inventory, findings per environment, resource impact summary, and a prioritized intervention plan; on request, also an interactive tabbed HTML version. Reports are written in the language you use with Claude
 4. **Interactive Validation** — asks you about each recommendation before acting (3-4 decisions at a time)
 5. **Apply Changes** — backups first, then changes one category at a time with JSON validation after each edit
 6. **Final Report** — documents everything done, manual actions remaining, restore instructions, and periodic maintenance schedule
 
-## Platform Compatibility
+## The Three Environments
 
-The skill works on all Claude platforms, adapting its scope to what each environment supports:
+The audit covers Claude Desktop and treats each of its environments as a complete stack — what a session there actually receives:
 
-| Layer | claude.ai | Chat | Cowork | Code (CLI & Desktop app) |
-|-------|-----------|------|--------|--------------------------|
-| System prompt | Project prompts | User Preferences + Project prompts | User Preferences + CLAUDE.md | CLAUDE.md (global + project-level) |
-| MCP servers | Connectors (session context) | claude_desktop_config.json | claude_desktop_config.json | ~/.claude.json (user scope) + .mcp.json (project) |
-| Skills | Project skills (session context) | claude.ai skills (capabilities) | Local + plugin skills | Local + plugin skills |
-| Plugins | — | — | Marketplace plugins | Marketplace plugins (settings.json) |
-| Hooks / Permissions | — | — | — | settings.json |
-| Memory files | — | — | — | ~/.claude/projects/*/memory/ |
+| Layer | Chat | Cowork | Code |
+|-------|------|--------|------|
+| System prompt | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
+| MCP servers | claude_desktop_config.json | claude_desktop_config.json + connectors | ~/.claude.json (user scope) + .mcp.json (project) + claude_desktop_config.json |
+| Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
+| Plugins | — | Marketplace plugins | Marketplace plugins (settings.json) |
+| Hooks / Permissions | — | — | settings.json |
+| Memory files | — | — | ~/.claude/projects/*/memory/ |
 
-All tiers (free and paid) have access to Projects, MCP connectors, and skills on claude.ai. The audit scope is the same regardless of plan.
-
-The Code column covers both frontends — the CLI and the Code tab in the Desktop app. They share instruction files, settings, skills and plugins, but diverge on MCP sources: the Desktop-app tab also loads servers from `claude_desktop_config.json`, the standalone CLI does not (unless imported via `claude mcp add-from-claude-desktop`).
-
-### Cross-platform detection
-
-When running with filesystem access, the skill checks whether the other platform is also configured:
-
-- **From Claude Code**: checks if `claude_desktop_config.json` exists and offers to audit Desktop MCP servers too
-- **From Claude Desktop**: checks if `~/.claude.json` exists (user-scope MCP servers) or if `settings.json` contains Code-specific keys (hooks, permissions) and offers to audit them
+Components are shared across environments, so each is verified once — but duplicates, context cost, and coherence are judged per environment, where they are paid.
 
 ## Configuration files analyzed
 
@@ -165,7 +156,7 @@ Directory structure validation. Orphan files (archives, backups). Superseded ski
 Overlap detection between User Preferences and CLAUDE.md. Stale references to removed tools. Token estimation per prompt layer.
 
 ### Instruction hierarchy
-Effective stack per platform (what each session actually receives, including the fact that Claude Code never sees User Preferences). Rules placed at the wrong level. Drift between platform copies of the same config. Coverage gaps. A rewrite test ("in general X, but in this context Y") separates true conflicts from legitimate specialization, which goes to an informational override map instead of the issues list.
+Effective stack per environment (what each session actually receives, including the fact that the Code environment never sees User Preferences). Rules placed at the wrong level. The unit of comparison is the stack, not the file: differences that compensate a missing level are declared compensation, not drift; drift is divergence in the shared core. A rewrite test ("in general X, but in this context Y") separates true conflicts from legitimate specialization, which goes to an informational override map instead of the issues list.
 
 ### Hooks & Permissions (Claude Code)
 Duplicate or conflicting hooks. Broken hooks referencing missing scripts. Overly broad permission rules. Stale permissions for removed MCP servers.

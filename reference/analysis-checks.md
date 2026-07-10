@@ -13,8 +13,8 @@ Servers that provide structured step-by-step reasoning:
 
 These overlap with Claude's native reasoning capabilities, especially in
 Claude Opus and Sonnet. They add marginal value in Chat/Cowork where the
-model's reasoning is already strong. May have more value in Claude Code CLI
-for complex multi-step coding tasks.
+model's reasoning is already strong. May have more value in the Code
+environment for complex multi-step coding tasks.
 
 ### Web search servers
 Servers that provide web search capabilities:
@@ -275,8 +275,8 @@ Options for occasional-use servers:
 ## Context Cost Reference
 
 RAM measures what a server costs the machine; context tokens measure what
-the configuration costs every single conversation. On claude.ai, Chat, and
-Cowork, where the context window is the scarce resource, this cost usually
+the configuration costs every single conversation. On Chat and Cowork,
+where the context window is the scarce resource, this cost usually
 matters more than RAM.
 
 ### What consumes context
