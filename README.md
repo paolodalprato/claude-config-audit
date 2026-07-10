@@ -2,7 +2,7 @@
 
 A Claude skill that performs comprehensive audits of your Claude configuration — MCP servers, plugins, skills, system prompt, hooks, permissions, and memory files.
 
-**Current version: 2.0.1** — see the [changelog](CHANGELOG.md).
+**Current version: 2.1.0** — see the [changelog](CHANGELOG.md).
 
 ## What it does
 
@@ -16,6 +16,7 @@ This skill analyzes your entire Claude setup across all configuration layers and
 - **Intervention plan** — every recommendation consolidated in one cross-layer table with explanation, difficulty, and expected impact, quick wins first
 - **Interactive HTML report** (optional) — a self-contained tabbed page, one tab per layer plus the intervention plan, sortable tables, no external dependencies
 - **System prompt bloat** — instructions duplicated between User Preferences and CLAUDE.md, stale references to removed tools
+- **Instruction hierarchy** — the effective configuration stack each platform receives, rules placed at the wrong level, drift between config copies, coverage gaps, and an override map separating real conflicts from legitimate per-project specialization
 - **Project prompt overlap** (claude.ai) — same rules repeated across multiple Projects
 - **Skill ecosystem issues** — orphan files, superseded versions, plugin-vs-local-skill duplicates
 - **Plugin duplicates** — same plugin from multiple marketplaces, installed-but-never-enabled plugins, two data sources cross-referenced (`enabledPlugins` + `installed_plugins.json`)
@@ -50,6 +51,8 @@ The skill works on all Claude platforms, adapting its scope to what each environ
 | Memory files | — | — | — | ~/.claude/projects/*/memory/ |
 
 All tiers (free and paid) have access to Projects, MCP connectors, and skills on claude.ai. The audit scope is the same regardless of plan.
+
+The Code column covers both frontends — the CLI and the Code tab in the Desktop app. They share instruction files, settings, skills and plugins, but diverge on MCP sources: the Desktop-app tab also loads servers from `claude_desktop_config.json`, the standalone CLI does not (unless imported via `claude mcp add-from-claude-desktop`).
 
 ### Cross-platform detection
 
@@ -96,6 +99,7 @@ The final result should look like this:
 └── reference/
     ├── analysis-checks.md
     ├── health-checks.md
+    ├── hierarchy-checks.md
     ├── report-html-template.html
     └── report-template.md
 ```
@@ -135,6 +139,7 @@ claude-config-audit/
 └── reference/
     ├── analysis-checks.md           # Detection patterns for all issue types
     ├── health-checks.md             # Read-only operational checks for MCP servers
+    ├── hierarchy-checks.md          # Instruction hierarchy: placement, drift, specialization
     ├── report-html-template.html    # Self-contained tabbed HTML report (optional output)
     └── report-template.md           # Templates for initial and final reports
 ```
@@ -158,6 +163,9 @@ Directory structure validation. Orphan files (archives, backups). Superseded ski
 
 ### System Prompt
 Overlap detection between User Preferences and CLAUDE.md. Stale references to removed tools. Token estimation per prompt layer.
+
+### Instruction hierarchy
+Effective stack per platform (what each session actually receives, including the fact that Claude Code never sees User Preferences). Rules placed at the wrong level. Drift between platform copies of the same config. Coverage gaps. A rewrite test ("in general X, but in this context Y") separates true conflicts from legitimate specialization, which goes to an informational override map instead of the issues list.
 
 ### Hooks & Permissions (Claude Code)
 Duplicate or conflicting hooks. Broken hooks referencing missing scripts. Overly broad permission rules. Stale permissions for removed MCP servers.

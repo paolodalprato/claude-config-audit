@@ -1,6 +1,6 @@
 ---
 name: claude-config-audit
-version: 2.0.1
+version: 2.1.0
 description: >
   Comprehensive audit and optimization of Claude configuration: MCP servers,
   plugins, skills, system prompt (CLAUDE.md + User Preferences), and — on
@@ -84,6 +84,12 @@ All tiers (free and paid) have access to Projects, MCP connectors, and
 skills on claude.ai. Paid tiers typically have more connectors and higher
 usage limits, but the audit scope is the same.
 
+The Code column covers both frontends — the CLI and the Code tab in the
+Desktop app. They share instruction files, settings, skills and plugins,
+but diverge on MCP sources: the Desktop-app tab also loads servers from
+`claude_desktop_config.json`, the standalone CLI does not (unless
+imported via `claude mcp add-from-claude-desktop`).
+
 ## Audit Workflow
 
 ### Phase 1: Data Collection
@@ -156,9 +162,10 @@ knows whether the audit covers their full setup.
 ### Phase 2: Analysis
 
 Run these checks against the collected data. Read
-`reference/analysis-checks.md` for the detailed detection patterns and
+`reference/analysis-checks.md` for the detailed detection patterns,
 `reference/health-checks.md` for the operational verification of MCP
-servers.
+servers, and `reference/hierarchy-checks.md` for the instruction
+hierarchy analysis.
 
 **Cross-layer duplicate detection:**
 - MCP servers providing the same functionality (e.g., two reasoning servers,
@@ -203,6 +210,18 @@ servers.
 - Check for contradictory instructions across levels
 - Estimate token count for each prompt layer
 - Identify instructions referencing removed/unavailable tools
+
+**Instruction hierarchy analysis** (all platforms):
+- Reconstruct the effective stack each platform receives: which levels,
+  in what order, at what measured token cost — including the fact that
+  Claude Code never sees User Preferences, and the MCP-source asymmetry
+  between the Code CLI and the Desktop-app Code tab
+- Classify every cross-level difference with the four-outcome taxonomy:
+  misplacement, drift, coverage gap, presumed specialization. Detection
+  tests in `reference/hierarchy-checks.md`
+- Differences that pass the rewrite test ("in general X, but in this
+  context Y") are specialization, not findings: they go to the override
+  map, and ambiguous cases become validation questions
 
 **Project prompt analysis** (claude.ai — all tiers):
 - Check for instruction overlap across Project system prompts (same rules

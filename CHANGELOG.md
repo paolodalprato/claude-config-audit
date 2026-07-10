@@ -3,6 +3,27 @@
 All notable changes to this skill are documented in this file. The format
 is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.1.0] - 2026-07-11
+
+### Added
+
+- **Instruction hierarchy analysis** (`reference/hierarchy-checks.md`):
+  effective configuration stack per platform (what each session actually
+  receives, including the fact that Claude Code never sees User
+  Preferences), and a four-outcome classification of cross-level
+  differences — misplacement, drift, coverage gap, presumed
+  specialization. A rewrite test ("in general X, but in this context Y")
+  separates true conflicts from legitimate per-project overrides, which
+  go to an informational override map instead of the issues list.
+  Framework tested on a real multi-platform configuration before being
+  documented.
+- Effective stack and override map subsections in the report template.
+- Documented the MCP-source asymmetry between the Claude Code CLI and
+  the Code tab in the Desktop app: the latter also loads
+  `claude_desktop_config.json`. Noted in the platform matrix and in the
+  health checks (a server visible in one frontend and absent in the
+  other is not necessarily broken).
+
 ## [2.0.1] - 2026-07-10
 
 ### Added

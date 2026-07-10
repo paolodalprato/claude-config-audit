@@ -108,6 +108,11 @@ Recommend disabling after initial use. They can be re-enabled when needed.
 
 ## System Prompt Analysis
 
+For the cross-level hierarchy analysis — effective stack per platform,
+misplacement, drift vs. legitimate specialization, coverage gaps — see
+`hierarchy-checks.md`. The checks below cover content-level issues
+within and between the two global layers.
+
 ### Overlap detection between User Preferences and CLAUDE.md
 Common areas of duplication:
 - File naming conventions

@@ -23,8 +23,21 @@ and other technical identifiers as they are.
 - CLAUDE.md: [line count] lines, ~[token estimate] tokens
 - Overlap: [percentage]% of content duplicated between the two
 
+### Effective stack per platform
+| Session | Levels injected | Est. tokens |
+|---------|-----------------|-------------|
+[One row per platform the user works on — see reference/hierarchy-checks.md]
+
 ### Issues found
-[List specific duplications, contradictions, stale references]
+[Specific duplications, contradictions, stale references; hierarchy
+findings — misplaced rules, drift between copies, coverage gaps —
+classified per reference/hierarchy-checks.md, in the order:
+contradictions and gaps, drift, misplacement]
+
+### Override map
+| General rule | Overridden where | Declared? |
+|--------------|------------------|-----------|
+[Informational, not issues: legitimate specializations across levels]
 
 ### Recommendation
 [Consolidation strategy with rationale]

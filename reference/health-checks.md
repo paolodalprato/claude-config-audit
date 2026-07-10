@@ -73,6 +73,14 @@ A server whose backing service is down is not automatically a removal
 candidate: the user may start the service on demand. Status: degraded,
 with an explicit note on the dependency.
 
+## Frontend asymmetries (Claude Code)
+
+The two Code frontends share configuration but not MCP sources: the
+Desktop-app Code tab also loads `claude_desktop_config.json`, the
+standalone CLI does not. A server visible in one frontend and absent in
+the other is not necessarily broken — check which config file defines it
+before classifying.
+
 ## Health classification
 
 | Status | Meaning | Typical recommendation |
