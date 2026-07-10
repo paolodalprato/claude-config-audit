@@ -11,6 +11,8 @@ This skill analyzes your entire Claude setup across all configuration layers and
 - **Resource waste** — RAM per MCP server, startup latency from npx-based installs, Docker overhead
 - **Broken servers** — read-only health checks: missing script paths, unresolvable npx packages, placeholder credentials, backing services (Docker, Ollama) not running
 - **Context cost** — tokens injected in every session by MCP tool schemas, skill descriptions, and server instruction blocks, with deferred-loading awareness
+- **Intervention plan** — every recommendation consolidated in one cross-layer table with explanation, difficulty, and expected impact, quick wins first
+- **Interactive HTML report** (optional) — a self-contained tabbed page, one tab per layer plus the intervention plan, sortable tables, no external dependencies
 - **System prompt bloat** — instructions duplicated between User Preferences and CLAUDE.md, stale references to removed tools
 - **Project prompt overlap** (claude.ai) — same rules repeated across multiple Projects
 - **Skill ecosystem issues** — orphan files, superseded versions, plugin-vs-local-skill duplicates
@@ -27,7 +29,7 @@ The audit follows a 6-phase workflow:
 
 1. **Data Collection** — reads config files, session context, and cross-platform configs. Adapts to what's available (full filesystem access, session context only, or user-provided data)
 2. **Analysis** — cross-references all layers (MCP, plugins, skills, system prompt, hooks, permissions, memory) using documented detection patterns, runs read-only health checks on MCP servers, and estimates the context cost of the configuration
-3. **Report** — structured markdown report with platform info, findings per layer, resource impact summary, and recommendations
+3. **Report** — structured markdown report with platform info, findings per layer, resource impact summary, recommendations, and a prioritized intervention plan; on request, also an interactive tabbed HTML version
 4. **Interactive Validation** — asks you about each recommendation before acting (3-4 decisions at a time)
 5. **Apply Changes** — backups first, then changes one category at a time with JSON validation after each edit
 6. **Final Report** — documents everything done, manual actions remaining, restore instructions, and periodic maintenance schedule
@@ -92,6 +94,7 @@ The final result should look like this:
 └── reference/
     ├── analysis-checks.md
     ├── health-checks.md
+    ├── report-html-template.html
     └── report-template.md
 ```
 
@@ -130,6 +133,7 @@ claude-config-audit/
 └── reference/
     ├── analysis-checks.md           # Detection patterns for all issue types
     ├── health-checks.md             # Read-only operational checks for MCP servers
+    ├── report-html-template.html    # Self-contained tabbed HTML report (optional output)
     └── report-template.md           # Templates for initial and final reports
 ```
 

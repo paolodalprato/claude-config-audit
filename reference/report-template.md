@@ -140,7 +140,27 @@ placeholder credentials — with the exact failing check for each]
 
 ---
 
-## 8. Questions for You
+## 8. Intervention Plan
+
+[Consolidated, cross-layer list of every recommended action, ordered by
+convenience: quick wins — low difficulty, high impact — first.]
+
+| # | Intervention | Layer | Why | Difficulty | Expected impact | Your decision needed? |
+|---|--------------|-------|-----|------------|-----------------|----------------------|
+[Table rows]
+
+**Difficulty scale**: low = single file edit or toggle, reversible in
+seconds; medium = coordinated changes across files or platforms; high =
+requires investigation, migration, or restructuring before acting.
+
+**Impact**: quantify with the audit's own measurements where available
+(tokens per session, RAM, server and plugin counts); use qualitative
+impact (clarity, safety, maintainability) where numbers don't apply.
+Never present an assumed figure as a measured one.
+
+---
+
+## 9. Questions for You
 
 [Numbered list of decisions requiring user input]
 ```

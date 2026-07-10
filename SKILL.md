@@ -244,7 +244,21 @@ format. The report should include:
 2. **Issues found** — grouped by severity (duplicates, unused, conflicts,
    resource concerns)
 3. **Recommended actions** — each with clear rationale and expected impact
-4. **Questions for the user** — anything that requires their input to decide
+4. **Intervention plan** — one consolidated cross-layer table: every
+   action with its explanation, difficulty (low / medium / high) and
+   expected impact, ordered so quick wins come first. Scale definitions
+   in `reference/report-template.md`
+5. **Questions for the user** — anything that requires their input to decide
+
+After delivering the markdown report, offer an interactive HTML version:
+a tabbed, self-contained page with one tab per layer plus the
+intervention plan. If the user accepts, read
+`reference/report-html-template.html` and populate its placeholders with
+the report content, in the user's language. The file must remain fully
+self-contained — inline CSS and JS only, no CDN or external resources —
+so it opens offline months later. Save it next to the markdown report,
+same base name, `.html` extension. The markdown report remains the
+canonical output for archiving and comparing audits over time.
 
 Present the report to the user and pause. Don't proceed to changes until
 they've reviewed and discussed.

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<!--
+  Interactive audit report template.
+  How to use (instructions for the generating assistant):
+  - Replace every {{PLACEHOLDER}} with content from the markdown report.
+  - Write all visible content in the user's language; translate the tab
+    labels and table headers too.
+  - Remove the <button> and matching <section> of any layer that does not
+    apply to the audited platform (e.g. hooks/memory outside Claude Code).
+  - Section content is plain HTML: use <table> for inventories, <p> for
+    narrative, the .pill classes for statuses (ok / warn / bad) and
+    difficulty (ok=low, warn=medium, bad=high).
+  - Keep the file fully self-contained: no CDN, no external images or
+    fonts, inline CSS/JS only. It must open offline.
+-->
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} — {{DATE}}</title>
+<style>
+  :root { --bg:#f7f7f5; --card:#ffffff; --ink:#1a1a1a; --muted:#6b6b6b;
+          --accent:#2f6fed; --ok:#2e7d32; --warn:#b26a00; --bad:#c62828;
+          --border:#e3e3df; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+         background:var(--bg); color:var(--ink); line-height:1.55; }
+  header { padding:28px 32px 18px; }
+  header h1 { margin:0 0 6px; font-size:1.45rem; }
+  header .meta { color:var(--muted); font-size:.9rem; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:99px;
+           font-size:.78rem; border:1px solid var(--border);
+           background:var(--card); margin-right:6px; }
+  nav { display:flex; flex-wrap:wrap; gap:4px; padding:0 32px;
+        border-bottom:1px solid var(--border); position:sticky; top:0;
+        background:var(--bg); z-index:2; }
+  nav button { border:none; background:none; padding:10px 14px;
+               font-size:.92rem; cursor:pointer; color:var(--muted);
+               border-bottom:2px solid transparent; }
+  nav button.active { color:var(--ink); border-bottom-color:var(--accent);
+                      font-weight:600; }
+  main { padding:24px 32px 48px; max-width:1080px; }
+  section.tab { display:none; }
+  section.tab.active { display:block; }
+  .cards { display:grid; gap:12px; margin:16px 0 24px;
+           grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); }
+  .card { background:var(--card); border:1px solid var(--border);
+          border-radius:10px; padding:14px 16px; }
+  .card .num { font-size:1.6rem; font-weight:700; }
+  .card .lbl { color:var(--muted); font-size:.82rem; }
+  table { border-collapse:collapse; width:100%; background:var(--card);
+          border:1px solid var(--border); border-radius:10px;
+          overflow:hidden; margin:12px 0 20px; font-size:.92rem; }
+  th, td { padding:8px 12px; border-bottom:1px solid var(--border);
+           text-align:left; vertical-align:top; }
+  th { background:#efefec; cursor:pointer; user-select:none; }
+  th::after { content:" ↕"; color:var(--muted); font-size:.75rem; }
+  tr:last-child td { border-bottom:none; }
+  .pill { display:inline-block; padding:1px 9px; border-radius:99px;
+          font-size:.78rem; font-weight:600; }
+  .pill.ok { background:#e6f4e7; color:var(--ok); }
+  .pill.warn { background:#fff3e0; color:var(--warn); }
+  .pill.bad { background:#fdecea; color:var(--bad); }
+  .bar { background:#e9e9e5; border-radius:6px; height:14px;
+         overflow:hidden; margin:4px 0 12px; }
+  .bar > span { display:block; height:100%; background:var(--accent); }
+  h2 { font-size:1.15rem; margin-top:26px; }
+  h3 { font-size:1rem; }
+  .note { color:var(--muted); font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>{{TITLE}}</h1>
+  <div class="meta">{{DATE}} · <span class="badge">{{PLATFORM_DETECTED}}</span>
+    {{PLATFORMS_ANALYZED_LABEL}}: {{PLATFORMS_ANALYZED}}</div>
+</header>
+<nav id="tabs">
+  <button data-tab="overview" class="active">{{TAB_OVERVIEW}}</button>
+  <button data-tab="prompt">{{TAB_PROMPT}}</button>
+  <button data-tab="mcp">{{TAB_MCP}}</button>
+  <button data-tab="plugins">{{TAB_PLUGINS}}</button>
+  <button data-tab="skills">{{TAB_SKILLS}}</button>
+  <button data-tab="hooks">{{TAB_HOOKS}}</button>
+  <button data-tab="memory">{{TAB_MEMORY}}</button>
+  <button data-tab="plan">{{TAB_PLAN}}</button>
+</nav>
+<main>
+  <section class="tab active" id="tab-overview">
+    <!-- One .card per metric of the Resource Impact Summary, e.g.
+         <div class="card"><div class="num">8</div><div class="lbl">MCP servers</div></div> -->
+    <div class="cards">{{OVERVIEW_CARDS}}</div>
+    <!-- Context cost bar: span width = current cost as % of the context
+         window; label the numbers and the measured/assumed method. -->
+    {{OVERVIEW_CONTEXT_BAR}}
+    <!-- Short narrative: the 2-3 findings that matter most. -->
+    {{OVERVIEW_SUMMARY}}
+  </section>
+
+  <section class="tab" id="tab-prompt">{{PROMPT_CONTENT}}</section>
+  <section class="tab" id="tab-mcp">
+    <!-- MCP inventory with Health pills: ok=OK, warn=degraded/unverifiable,
+         bad=broken/misconfigured. Mark context cost per server as
+         measured / deferred / assumed. -->
+    {{MCP_CONTENT}}
+  </section>
+  <section class="tab" id="tab-plugins">{{PLUGINS_CONTENT}}</section>
+  <section class="tab" id="tab-skills">{{SKILLS_CONTENT}}</section>
+  <section class="tab" id="tab-hooks">{{HOOKS_CONTENT}}</section>
+  <section class="tab" id="tab-memory">{{MEMORY_CONTENT}}</section>
+  <section class="tab" id="tab-plan">
+    <!-- Intervention plan table: # | intervention | layer | why |
+         difficulty (pill: ok=low, warn=medium, bad=high) | expected
+         impact | decision needed. Quick wins first. Include the
+         difficulty scale legend as a .note paragraph. -->
+    {{PLAN_CONTENT}}
+  </section>
+</main>
+<script>
+  // Tab switching.
+  const nav = document.getElementById('tabs');
+  nav.addEventListener('click', e => {
+    const btn = e.target.closest('button'); if (!btn) return;
+    nav.querySelectorAll('button').forEach(b =>
+      b.classList.toggle('active', b === btn));
+    document.querySelectorAll('section.tab').forEach(s =>
+      s.classList.toggle('active', s.id === 'tab-' + btn.dataset.tab));
+  });
+  // Sortable tables: click a header to sort (numeric when possible).
+  document.querySelectorAll('th').forEach(th => th.addEventListener('click', () => {
+    const table = th.closest('table'), tbody = table.tBodies[0];
+    if (!tbody) return;
+    const i = [...th.parentNode.children].indexOf(th);
+    const dir = th.dataset.dir = th.dataset.dir === 'asc' ? 'desc' : 'asc';
+    const rows = [...tbody.rows].sort((a, b) => {
+      const x = (a.cells[i]?.innerText ?? '').trim();
+      const y = (b.cells[i]?.innerText ?? '').trim();
+      const nx = parseFloat(x.replace(/[^\d.,-]/g, '').replace(',', '.'));
+      const ny = parseFloat(y.replace(/[^\d.,-]/g, '').replace(',', '.'));
+      const cmp = (!isNaN(nx) && !isNaN(ny)) ? nx - ny : x.localeCompare(y);
+      return dir === 'asc' ? cmp : -cmp;
+    });
+    rows.forEach(r => tbody.appendChild(r));
+  }));
+</script>
+</body>
+</html>
