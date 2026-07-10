@@ -155,7 +155,9 @@ knows whether the audit covers their full setup.
 ### Phase 2: Analysis
 
 Run these checks against the collected data. Read
-`reference/analysis-checks.md` for the detailed detection patterns.
+`reference/analysis-checks.md` for the detailed detection patterns and
+`reference/health-checks.md` for the operational verification of MCP
+servers.
 
 **Cross-layer duplicate detection:**
 - MCP servers providing the same functionality (e.g., two reasoning servers,
@@ -175,6 +177,24 @@ Run these checks against the collected data. Read
 - Count total processes spawned at session start
 - Identify servers using npx (adds startup latency for package download)
 - Flag Docker-based servers as highest resource cost
+
+**Operational health checks** (filesystem access required):
+- Verify each MCP server can actually run: script paths exist, runtimes
+  and packages resolve, env vars are set and not placeholders, backing
+  services (Docker, Ollama) are reachable. Never launch the server itself.
+- Classify each server: OK / degraded / broken / misconfigured /
+  unverifiable. Patterns and OS commands in `reference/health-checks.md`.
+- Feed the status into the MCP inventory table of the report.
+
+**Context cost assessment:**
+- Measure the tokens injected per session from what is actually visible
+  in the session context: characters of tool schemas, skill descriptions,
+  and server instruction blocks, divided by 4. Fall back to count-based
+  ranges only for servers not loaded in the session, labeled as assumptions
+- Note whether the platform defers tool schemas — it changes what to
+  optimize (see Context Cost Reference in `reference/analysis-checks.md`)
+- Flag high-tool-count servers that are rarely used, and plugins bundling
+  many skills of which the user uses few
 
 **System prompt analysis:**
 - Measure overlap between User Preferences and CLAUDE.md (identify paragraphs

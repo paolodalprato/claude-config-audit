@@ -266,3 +266,65 @@ Options for occasional-use servers:
 - **Remove and re-add**: delete the entry from the JSON when not needed,
   paste it back when needed. Keep a backup of the entry. This is the only
   reliable way to fully disable a custom server.
+
+## Context Cost Reference
+
+RAM measures what a server costs the machine; context tokens measure what
+the configuration costs every single conversation. On claude.ai, Chat, and
+Cowork, where the context window is the scarce resource, this cost usually
+matters more than RAM.
+
+### What consumes context
+
+| Element | What gets injected | Rough cost |
+|---------|-------------------|------------|
+| MCP server tool | one schema per tool: name, description, parameters | ~150-600 tokens per tool |
+| MCP server instructions | optional server-level instructions block | ~100-1,000 tokens per server |
+| Installed skill | its description in the available-skills list | ~50-150 tokens per skill |
+| Invoked skill | the full SKILL.md body, only when triggered | file characters ÷ 4 |
+| Plugin | descriptions of every bundled skill | scales with bundle size |
+
+### How to measure
+
+Measure, don't multiply. The auditing session already contains the real
+text of every loaded tool schema and skill description, so the cost is
+computed from what is actually injected, not from a flat per-tool average.
+
+- **Loaded tool schemas**: for each server whose tools are visible in the
+  session, sum the characters of its tool definitions (name, description,
+  parameters) and divide by 4. This is a per-server measurement.
+- **Deferred tools**: if the platform lists a tool by name only, its schema
+  is not injected until loaded — count only the name entry as always-paid
+  cost, and note the on-demand cost separately.
+- **Skill descriptions**: same method, characters of each description in
+  the available-skills list ÷ 4.
+- **Servers not loaded in the auditing session** (e.g., auditing a Desktop
+  config from Claude Code): their schemas are not observable without
+  launching the server, which the audit never does. Report them as "not
+  measurable in this session" with the tool count if known. If a rough
+  figure is indispensable, use a declared range (150-600 tokens per tool)
+  and label it as an assumption, never as a measurement.
+- In the report, state per server which method was used: measured,
+  deferred, or assumed.
+- Compare the total against the model's context window: a configuration
+  consuming 15-20k tokens before the first user message deserves attention.
+
+### Deferred loading changes the math
+
+Some environments (Cowork, recent Claude Code versions) defer tool
+schemas: only tool names appear in context until a tool is actually
+loaded on demand. Where deferred loading is active, a high tool count
+costs little until used, and the optimization target shifts to what is
+always injected in full: skill descriptions, server instruction blocks,
+and system prompt layers. State in the report whether the platform defers
+schemas, because the same configuration can be cheap on one platform and
+expensive on another.
+
+### What to flag
+
+- Servers exposing 15+ tools that the user touches rarely
+- Multiple servers with overlapping tools (the duplicate pays twice)
+- Plugins bundling many skills of which the user uses one or two — every
+  bundled skill description is injected in every session
+- Skill descriptions much longer than needed for reliable triggering: the
+  description, not the body, is the always-paid cost

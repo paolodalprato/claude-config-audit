@@ -9,6 +9,8 @@ This skill analyzes your entire Claude setup across all configuration layers and
 - **Duplicate MCP servers** — two reasoning tools, two search APIs, overlapping filesystem servers, multiple PDF tools
 - **Unused elements** — servers requiring services not running, skills never used, setup plugins still active
 - **Resource waste** — RAM per MCP server, startup latency from npx-based installs, Docker overhead
+- **Broken servers** — read-only health checks: missing script paths, unresolvable npx packages, placeholder credentials, backing services (Docker, Ollama) not running
+- **Context cost** — tokens injected in every session by MCP tool schemas, skill descriptions, and server instruction blocks, with deferred-loading awareness
 - **System prompt bloat** — instructions duplicated between User Preferences and CLAUDE.md, stale references to removed tools
 - **Project prompt overlap** (claude.ai) — same rules repeated across multiple Projects
 - **Skill ecosystem issues** — orphan files, superseded versions, plugin-vs-local-skill duplicates
@@ -24,7 +26,7 @@ It then guides you through an interactive cleanup, creating backups before any c
 The audit follows a 6-phase workflow:
 
 1. **Data Collection** — reads config files, session context, and cross-platform configs. Adapts to what's available (full filesystem access, session context only, or user-provided data)
-2. **Analysis** — cross-references all layers (MCP, plugins, skills, system prompt, hooks, permissions, memory) for issues using documented detection patterns
+2. **Analysis** — cross-references all layers (MCP, plugins, skills, system prompt, hooks, permissions, memory) using documented detection patterns, runs read-only health checks on MCP servers, and estimates the context cost of the configuration
 3. **Report** — structured markdown report with platform info, findings per layer, resource impact summary, and recommendations
 4. **Interactive Validation** — asks you about each recommendation before acting (3-4 decisions at a time)
 5. **Apply Changes** — backups first, then changes one category at a time with JSON validation after each edit
@@ -89,6 +91,7 @@ The final result should look like this:
 ├── SKILL.md
 └── reference/
     ├── analysis-checks.md
+    ├── health-checks.md
     └── report-template.md
 ```
 
@@ -126,6 +129,7 @@ claude-config-audit/
 ├── SKILL.md                         # Main skill file (workflow + guidelines)
 └── reference/
     ├── analysis-checks.md           # Detection patterns for all issue types
+    ├── health-checks.md             # Read-only operational checks for MCP servers
     └── report-template.md           # Templates for initial and final reports
 ```
 
@@ -133,6 +137,12 @@ claude-config-audit/
 
 ### MCP Servers
 Known overlap patterns for reasoning servers, web search, filesystem access, PDF tools, and image generation. RAM estimates per server type (Node.js, Python, Docker). MCP server toggle limitations documented.
+
+### Server health
+Read-only verification that each server can actually run: script paths, runtimes, package resolvability, env vars, backing services. Servers are classified OK, degraded, broken, misconfigured, or unverifiable — the audit never launches a server to test it.
+
+### Context cost
+Token cost measured from the actual tool schemas, skill descriptions, and server instruction blocks visible in the auditing session — not from flat per-tool averages. Servers not loaded in the session are reported with declared assumptions. Accounts for platforms with deferred tool loading, where the math changes.
 
 ### Plugins
 Same plugin from multiple marketplaces. Plugin vs. local skill overlap. Setup/onboarding plugins still active. Two data sources cross-referenced for completeness.
@@ -151,7 +161,7 @@ Stale memories (3+ months old). Orphan files not in MEMORY.md index. Index consi
 
 ## Contributing
 
-Issues and pull requests are welcome. If you discover new MCP server overlap patterns, plugin conflicts, or platform-specific behaviors, feel free to contribute them to `reference/analysis-checks.md`.
+Issues and pull requests are welcome. If you discover new MCP server overlap patterns, plugin conflicts, or platform-specific behaviors, feel free to contribute them to `reference/analysis-checks.md`; new operational verification patterns belong in `reference/health-checks.md`.
 
 ## License
 

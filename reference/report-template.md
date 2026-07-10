@@ -30,14 +30,19 @@ Adapt sections based on what was found — skip sections with no findings.
 
 ### Current inventory ([count] servers)
 
-| # | Server | Type | Install | Resource cost | Status |
-|---|--------|------|---------|---------------|--------|
-[Table rows]
+| # | Server | Type | Install | Tools | Resource cost | Health |
+|---|--------|------|---------|-------|---------------|--------|
+[Table rows — Health from health-checks.md: OK / degraded / broken / misconfigured / unverifiable.
+For context cost, mark per server whether the figure is measured, deferred, or assumed.]
 
 ### Issues found
 
 #### Duplicates
 [Group by functionality overlap]
+
+#### Broken or misconfigured
+[Servers failing health checks: missing paths, unresolvable packages,
+placeholder credentials — with the exact failing check for each]
 
 #### Unused/dormant
 [Servers requiring unavailable external services]
@@ -124,7 +129,9 @@ Adapt sections based on what was found — skip sections with no findings.
 | Metric | Current | After optimization | Savings |
 |--------|---------|-------------------|---------|
 | MCP servers | [n] | [n] | -[n] |
+| MCP tools exposed | [n] | [n] | -[n] |
 | Estimated RAM | [n] MB | [n] MB | -[n] MB |
+| Estimated context cost | ~[n] tokens | ~[n] tokens | -[n]% |
 | Enabled plugins | [n] | [n] | -[n] |
 | Skill count (loaded) | [n] | [n] | -[n] |
 | Hooks configured | [n] | [n] | -[n] |
