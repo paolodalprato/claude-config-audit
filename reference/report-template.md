@@ -5,8 +5,9 @@ report. Adapt sections based on what was found — skip sections with no
 findings.
 
 The report is a photograph of the current state: no comparisons with
-previous audits and no references to earlier reports, unless the user
-explicitly asks for a comparison.
+previous audits, no references to earlier reports, and no searching for
+them — don't even ask. If the user wants a comparison, they will say so
+and provide the earlier report.
 
 The template is written in English but defines structure, not language:
 produce the report in the language the user is using, translating

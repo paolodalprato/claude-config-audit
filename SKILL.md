@@ -336,9 +336,11 @@ actually works, not for theoretical perfection. If they use Chat and Cowork
 90% of the time, a Code-only tool matters less. If they're a developer,
 code-oriented plugins make sense even if used occasionally.
 
-**The report is a photograph.** Document the current state only. Never
-compare with previous audits or reference earlier reports unless the
-user explicitly asks for a comparison.
+**The report is a photograph.** Document the current state only. Do not
+look for previous audit reports, do not read them if you come across
+them, and do not ask whether the user wants a comparison: comparing is
+out of scope unless the user explicitly requests it and provides the
+report to compare against.
 
 **Verify before classifying.** Before labeling a folder as leftover or
 orphaned, open its SKILL.md (or main file) and read it. When reporting

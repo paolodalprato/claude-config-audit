@@ -30,6 +30,9 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - The offer of the interactive HTML report is now an explicit,
   non-optional step closing Phase 3. Test runs showed it was skipped
   when phrased as prose at the end of the phase.
+- Photograph rule hardened: the audit must not look for previous
+  reports, read them, or offer a comparison. Test runs showed it found
+  old reports on disk and asked whether to compare.
 - Footprint table: the user-managed total now explicitly includes the
   installed components (skill descriptions and tool definitions), which
   are as user-controlled as the instruction files — making that count
