@@ -10,6 +10,7 @@ This skill analyzes your entire Claude setup across all configuration layers and
 
 - **Duplicate MCP servers** — two reasoning tools, two search APIs, overlapping filesystem servers, multiple PDF tools
 - **Unused elements** — servers requiring services not running, skills never used, setup plugins still active
+- **System prompt footprint** — every report opens with the total size of the session's system prompt, split into the system-managed part (fixed) and the user-managed part (instructions plus installed components — your actionable surface)
 - **Resource waste** — RAM per MCP server, startup latency from npx-based installs, Docker overhead
 - **Broken servers** — read-only health checks: missing script paths, unresolvable npx packages, placeholder credentials, backing services (Docker, Ollama) not running
 - **Context cost** — tokens injected in every session by MCP tool schemas, skill descriptions, and server instruction blocks, with deferred-loading awareness
@@ -32,7 +33,7 @@ The audit follows a 6-phase workflow:
 
 1. **Data Collection** — reads config files and session context. Adapts to what's available (full filesystem access, session context only, or user-provided data)
 2. **Analysis** — verifies each component once, then analyzes each environment (Chat, Cowork, Code) as the complete stack it receives: internal duplicates, measured context cost, unused elements, plus cross-environment checks and read-only health checks on MCP servers
-3. **Report** — structured markdown report with a component inventory, findings per environment, resource impact summary, and a prioritized intervention plan; on request, also an interactive tabbed HTML version. Reports are written in the language you use with Claude
+3. **Report** — structured markdown report that opens with the system prompt footprint (system-managed vs. user-managed split), followed by a component inventory, findings per environment, resource impact summary, and a prioritized intervention plan; on request, also an interactive tabbed HTML version. Reports are written in the language you use with Claude
 4. **Interactive Validation** — asks you about each recommendation before acting (3-4 decisions at a time)
 5. **Apply Changes** — backups first, then changes one category at a time with JSON validation after each edit
 6. **Final Report** — documents everything done, manual actions remaining, restore instructions, and periodic maintenance schedule
@@ -54,7 +55,7 @@ Components are shared across environments, so each is verified once — but dupl
 
 ### What the audit can and cannot touch
 
-Everything this skill audits is the **user-managed layer** of a session's system prompt: User Preferences, CLAUDE.md files, project prompts, and the components you install (skills, MCP servers, plugins), whose descriptions and tool schemas the platform injects into context.
+Everything this skill audits is the **user-managed layer** of a session's system prompt: User Preferences, CLAUDE.md files, project prompts, and the components you install (skills, MCP servers, plugins), whose descriptions and tool definitions the platform injects into context. A tool definition (schema) is the machine-readable card of a single tool — name, description, parameters — that every server or connector adds to context; a 26-tool server injects 26 of them. Both halves of this layer are equally under your control: you decide which servers, connectors, plugins and skills stay loaded, and making that count visible is one of the audit's purposes.
 
 Above that layer sits a **system-managed part**, defined by the platform vendor and not configurable: product identity and behavior policies, safety rules, default tone and formatting, the usage instructions and schemas of built-in tools, and runtime metadata (date, workspace paths). It is usually the larger share of the prompt. The audit reports its size for proportion — it is the fixed overhead that explains why optimizing the user-managed layer is worthwhile: it is the only lever available.
 
