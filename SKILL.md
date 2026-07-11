@@ -65,12 +65,18 @@ a complete stack — what a session there actually receives:
 
 | Layer | Chat | Cowork | Code |
 |-------|------|--------|------|
-| System prompt | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
+| User instruction layers | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
 | MCP servers | claude_desktop_config.json | claude_desktop_config.json + connectors | ~/.claude.json (user scope) + .mcp.json (project) + claude_desktop_config.json |
 | Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
 | Plugins | — | Marketplace plugins | Marketplace plugins (settings.json) |
 | Hooks / Permissions | — | — | settings.json |
 | Memory files | — | — | ~/.claude/projects/*/memory/ |
+
+The table shows the user-managed layers only: each environment also
+receives its own system-managed prompt part (product identity, behavior
+policies, built-in tool instructions and schemas, runtime metadata),
+which the report measures in the opening footprint for proportion but
+never audits — it is not configurable.
 
 Components are shared across environments (the same server definition
 can feed more than one environment), so verify each component once, but

@@ -44,12 +44,14 @@ The audit covers Claude Desktop and treats each of its environments as a complet
 
 | Layer | Chat | Cowork | Code |
 |-------|------|--------|------|
-| System prompt | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
+| User instruction layers | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
 | MCP servers | claude_desktop_config.json | claude_desktop_config.json + connectors | ~/.claude.json (user scope) + .mcp.json (project) + claude_desktop_config.json |
 | Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
 | Plugins | — | Marketplace plugins | Marketplace plugins (settings.json) |
 | Hooks / Permissions | — | — | settings.json |
 | Memory files | — | — | ~/.claude/projects/*/memory/ |
+
+The table shows the user-managed layers only: on top of them, each environment injects its own system-managed prompt part, described in the next section.
 
 Components are shared across environments, so each is verified once — but duplicates, context cost, and coherence are judged per environment, where they are paid.
 
@@ -57,7 +59,18 @@ Components are shared across environments, so each is verified once — but dupl
 
 Everything this skill audits is the **user-managed layer** of a session's system prompt: User Preferences, CLAUDE.md files, project prompts, and the components you install (skills, MCP servers, plugins), whose descriptions and tool definitions the platform injects into context. A tool definition (schema) is the machine-readable card of a single tool — name, description, parameters — that every server or connector adds to context; a 26-tool server injects 26 of them. Both halves of this layer are equally under your control: you decide which servers, connectors, plugins and skills stay loaded, and making that count visible is one of the audit's purposes.
 
-Above that layer sits a **system-managed part**, defined by the platform vendor and not configurable: product identity and behavior policies, safety rules, default tone and formatting, the usage instructions and schemas of built-in tools, and runtime metadata (date, workspace paths). It is usually the larger share of the prompt. The audit reports its size for proportion — it is the fixed overhead that explains why optimizing the user-managed layer is worthwhile: it is the only lever available.
+Above that layer sits a **system-managed part**, defined by the platform vendor and not configurable. In a real session it typically includes:
+
+- **Product identity and context** — which model and product is running, how it presents itself, product information and where to send the user for documentation
+- **Behavior policies** — safety rules, handling of sensitive requests, evenhandedness on controversial topics, care for user wellbeing. Non-negotiable by design: no user layer can override them
+- **Default tone and formatting** — prose vs. lists, emoji policy, conciseness norms. This is the baseline your User Preferences layer on top of
+- **Tool orchestration** — usage instructions for every built-in tool (files, shell, web search, computer use), operational safety rules (link handling, web fetch restrictions), the machinery that triggers skills and manages memory, plus the schemas of the built-in tools themselves. Usually the largest single block
+- **Runtime metadata** — current date, user name, workspace paths, model identifier
+- **Dynamic injections** — reminders and warnings the platform can add mid-conversation (long-conversation reminders, classifier warnings)
+
+Two practical consequences follow. **Precedence**: the system part sets the boundaries and the defaults; user layers customize within those boundaries, and in a conflict the system part wins by construction. **Observability**: the system part can only be measured from inside a session, and each environment has its own — which is why the report's footprint states which environment it measured and never guesses the others.
+
+The system-managed part is usually the larger share of the whole prompt, often several times the user-managed layer. The audit reports its size for proportion only: it is the fixed overhead that explains why optimizing the user-managed layer is worthwhile — it is the only lever available.
 
 For the chat apps, Anthropic publishes the system prompts with periodic release notes: see the [System Prompts release notes](https://docs.anthropic.com/en/release-notes/system-prompts).
 
