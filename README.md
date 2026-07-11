@@ -44,6 +44,7 @@ The audit covers Claude Desktop and treats each of its environments as a complet
 
 | Layer | Chat | Cowork | Code |
 |-------|------|--------|------|
+| System instruction layer (not user-manageable) | Chat's own system-managed part | Cowork's own system-managed part | Code's own system-managed part |
 | User instruction layers | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
 | MCP servers | claude_desktop_config.json | claude_desktop_config.json + connectors | ~/.claude.json (user scope) + .mcp.json (project) + claude_desktop_config.json |
 | Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
@@ -51,7 +52,7 @@ The audit covers Claude Desktop and treats each of its environments as a complet
 | Hooks / Permissions | — | — | settings.json |
 | Memory files | — | — | ~/.claude/projects/*/memory/ |
 
-The table shows the user-managed layers only: on top of them, each environment injects its own system-managed prompt part, described in the next section.
+Every layer below the first is user-managed. The system instruction layer — product identity, behavior policies, built-in tool instructions and schemas, runtime metadata — is specific to each environment and is described in the next section: the report measures it for proportion, but it cannot be audited or configured.
 
 Components are shared across environments, so each is verified once — but duplicates, context cost, and coherence are judged per environment, where they are paid.
 
