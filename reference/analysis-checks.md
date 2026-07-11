@@ -272,6 +272,14 @@ Options for occasional-use servers:
   paste it back when needed. Keep a backup of the entry. This is the only
   reliable way to fully disable a custom server.
 
+Account connectors (unlike config-file servers) can be toggled per
+conversation from the "+" menu in the chat interface — a manual
+mechanism, not an automatic one, but useful for occasional-use
+connectors. Note also that where deferred tool loading is active
+(Cowork), unused servers cost only their tool names in context, not the
+full schemas: removing a server from the config saves RAM and startup
+time, but fewer tokens than the tool count suggests.
+
 ## Context Cost Reference
 
 RAM measures what a server costs the machine; context tokens measure what
