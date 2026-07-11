@@ -325,6 +325,19 @@ and system prompt layers. State in the report whether the platform defers
 schemas, because the same configuration can be cheap on one platform and
 expensive on another.
 
+### The whole system prompt, for proportion
+
+The session's system prompt is larger than the user-managed layer alone:
+above it sits the system-managed part — product identity and behavior
+policies, tone defaults, usage instructions and schemas of built-in
+tools, runtime metadata — defined by the platform and not configurable.
+Estimate both parts from what is visible in the session context
+(characters ÷ 4, ÷ 3 for Italian-heavy blocks) and report the split at
+the top of the report. The system part is fixed overhead: report it for
+proportion, never as something to optimize. The middle zone — skill
+descriptions and MCP schemas — counts as user-managed: the user chose to
+install those components, and removing them is the audit's main lever.
+
 ### What to flag
 
 - Servers exposing 15+ tools that the user touches rarely

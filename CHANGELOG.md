@@ -27,6 +27,12 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- **System prompt footprint**: the report opens with the total size of
+  the auditing session's system prompt, split into the system-managed
+  part (fixed: product and tool instructions, schemas, metadata) and the
+  user-managed part (instructions and installed components — the
+  audit's actionable surface). The documentation explains the
+  distinction and links Anthropic's published system prompts.
 - **Photograph rule**: the report documents the current state; no
   comparisons with previous audits unless explicitly requested.
 - **Verification discipline**: open a folder's SKILL.md before

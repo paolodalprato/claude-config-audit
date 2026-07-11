@@ -180,6 +180,13 @@ equivalence, compensation, coverage gaps) come last.
   in the session context: characters of tool schemas, skill descriptions,
   and server instruction blocks, divided by 4. Fall back to count-based
   ranges only for servers not loaded in the session, labeled as assumptions
+- Measure the total system prompt of the auditing session and split it:
+  system-managed part (product and tool instructions, tool schemas,
+  runtime metadata — fixed, not auditable) vs. user-managed part
+  (instructions and installed components — the audit's actionable
+  surface). Report the split at the top of the report. The system parts
+  of the other environments are not observable from this session: say
+  so, don't guess them
 - Note whether the platform defers tool schemas — it changes what to
   optimize (see Context Cost Reference in `reference/analysis-checks.md`)
 - Flag high-tool-count servers that are rarely used, and plugins bundling

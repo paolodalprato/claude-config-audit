@@ -52,6 +52,14 @@ The audit covers Claude Desktop and treats each of its environments as a complet
 
 Components are shared across environments, so each is verified once — but duplicates, context cost, and coherence are judged per environment, where they are paid.
 
+### What the audit can and cannot touch
+
+Everything this skill audits is the **user-managed layer** of a session's system prompt: User Preferences, CLAUDE.md files, project prompts, and the components you install (skills, MCP servers, plugins), whose descriptions and tool schemas the platform injects into context.
+
+Above that layer sits a **system-managed part**, defined by the platform vendor and not configurable: product identity and behavior policies, safety rules, default tone and formatting, the usage instructions and schemas of built-in tools, and runtime metadata (date, workspace paths). It is usually the larger share of the prompt. The audit reports its size for proportion — it is the fixed overhead that explains why optimizing the user-managed layer is worthwhile: it is the only lever available.
+
+For the chat apps, Anthropic publishes the system prompts with periodic release notes: see the [System Prompts release notes](https://docs.anthropic.com/en/release-notes/system-prompts).
+
 ## Configuration files analyzed
 
 | File | Description |

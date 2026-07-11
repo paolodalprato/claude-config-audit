@@ -20,6 +20,19 @@ keys, and other technical identifiers as they are.
 
 **Environments analyzed**: [Chat / Cowork / Code]
 
+**System prompt footprint of this session** ([environment]):
+
+| Part | ~Tokens | Auditable? |
+|------|---------|------------|
+| System-managed (product and tool instructions, tool schemas, metadata) | | No — fixed overhead |
+| User-managed: instructions (User Preferences, CLAUDE.md, project prompt) | | Yes |
+| User-managed: installed components (skill descriptions, MCP schemas, server instructions) | | Yes |
+| **Total** | | |
+
+[Measured from the auditing session's context; the system parts of the
+other environments are not observable from here — say so instead of
+guessing.]
+
 ## 1. Component Inventory
 
 [Each component verified once, regardless of how many environments use
