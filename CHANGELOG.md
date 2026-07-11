@@ -25,6 +25,12 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   environment, cross-environment checks, intervention plan. HTML
   template tabs follow the same structure.
 
+### Fixed
+
+- The offer of the interactive HTML report is now an explicit,
+  non-optional step closing Phase 3. Test runs showed it was skipped
+  when phrased as prose at the end of the phase.
+
 ### Added
 
 - **System prompt footprint**: the report opens with the total size of

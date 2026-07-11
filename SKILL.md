@@ -261,18 +261,20 @@ format. The report should include:
    `reference/report-template.md`
 5. **Questions for the user** — anything that requires their input to decide
 
-After delivering the markdown report, offer an interactive HTML version:
-a tabbed, self-contained page with one tab per layer plus the
-intervention plan. If the user accepts, read
-`reference/report-html-template.html` and populate its placeholders with
-the report content, in the user's language. The file must remain fully
-self-contained — inline CSS and JS only, no CDN or external resources —
-so it opens offline months later. Save it next to the markdown report,
-same base name, `.html` extension. The markdown report remains the
-canonical output for archiving and comparing audits over time.
+Close Phase 3 with this exact sequence — none of these steps is optional:
 
-Present the report to the user and pause. Don't proceed to changes until
-they've reviewed and discussed.
+1. **Deliver the markdown report**, saved as a file the user can keep.
+2. **Ask the user whether they also want the interactive HTML version**:
+   a tabbed, self-contained page with one tab per environment plus the
+   intervention plan. If they accept, read
+   `reference/report-html-template.html` and populate its placeholders
+   with the report content, in the user's language. The file must remain
+   fully self-contained — inline CSS and JS only, no CDN or external
+   resources — so it opens offline months later. Save it next to the
+   markdown report, same base name, `.html` extension. The markdown
+   report remains the canonical output for archiving.
+3. **Pause.** Don't proceed to changes until the user has reviewed the
+   report and the interactive validation of Phase 4 has taken place.
 
 ### Phase 4: Interactive Validation
 
