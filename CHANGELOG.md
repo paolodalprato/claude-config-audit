@@ -30,6 +30,12 @@ is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - The offer of the interactive HTML report is now an explicit,
   non-optional step closing Phase 3. Test runs showed it was skipped
   when phrased as prose at the end of the phase.
+- Footprint table: the user-managed total now explicitly includes the
+  installed components (skill descriptions and tool definitions), which
+  are as user-controlled as the instruction files — making that count
+  visible is one of the audit's purposes. Terminology clarified: "tool
+  definition (schema)" defined in place, plugins explicitly mentioned
+  as a source of skills and connectors.
 
 ### Added
 

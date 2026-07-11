@@ -334,9 +334,15 @@ tools, runtime metadata — defined by the platform and not configurable.
 Estimate both parts from what is visible in the session context
 (characters ÷ 4, ÷ 3 for Italian-heavy blocks) and report the split at
 the top of the report. The system part is fixed overhead: report it for
-proportion, never as something to optimize. The middle zone — skill
-descriptions and MCP schemas — counts as user-managed: the user chose to
-install those components, and removing them is the audit's main lever.
+proportion, never as something to optimize. Skill descriptions and tool
+definitions are fully user-managed, exactly like the instruction files:
+the user decides which servers, connectors, plugins and skills stay
+loaded, and making that count visible is one of the audit's purposes.
+Report a user-managed total that includes both instructions and
+installed components. (A tool definition, or schema, is the
+machine-readable card of a single tool — name, description, parameters —
+injected into context by every server or connector, including those
+bundled in plugins.)
 
 ### What to flag
 

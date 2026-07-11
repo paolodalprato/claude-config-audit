@@ -24,14 +24,21 @@ keys, and other technical identifiers as they are.
 
 | Part | ~Tokens | Auditable? |
 |------|---------|------------|
-| System-managed (product and tool instructions, tool schemas, metadata) | | No — fixed overhead |
-| User-managed: instructions (User Preferences, CLAUDE.md, project prompt) | | Yes |
-| User-managed: installed components (skill descriptions, MCP schemas, server instructions) | | Yes |
-| **Total** | | |
+| System-managed: product instructions, built-in tools, runtime metadata | | No — fixed overhead |
+| User-managed, instructions: User Preferences, CLAUDE.md, project prompt | | Yes |
+| User-managed, installed components: skill descriptions + tool definitions exposed by MCP servers and connectors (including those brought by plugins) + server instruction blocks | | Yes |
+| **User-managed total (instructions + components)** | | **Yes — the audit's actionable surface** |
+| Total | | |
 
-[Measured from the auditing session's context; the system parts of the
-other environments are not observable from here — say so instead of
-guessing.]
+[Both user-managed rows are equally under the user's control: the user
+decides which servers, connectors, plugins and skills stay loaded, and
+making that count visible is one of the audit's purposes — never present
+the components as second-class. A "tool definition" (schema) is the
+machine-readable card of a single tool — name, description, parameters —
+that every server or connector injects into context so the model can
+call it. Figures measured from the auditing session's context; the
+system parts of the other environments are not observable from here —
+say so instead of guessing.]
 
 ## 1. Component Inventory
 
