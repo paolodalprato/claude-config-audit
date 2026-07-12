@@ -1,13 +1,14 @@
 # Instruction Hierarchy Analysis — Stacks, Placement, Compensation
 
-Instructions live at multiple levels: User Preferences, global CLAUDE.md
-files, project prompts and project CLAUDE.md files. Each Desktop
+Instructions live at multiple levels: User Preferences, Cowork Global
+Instructions, Code's global and project CLAUDE.md files, and project
+prompts. Each Desktop
 environment receives a different stack:
 
 | Environment | Instruction stack |
 |-------------|-------------------|
 | Chat | User Preferences + active project prompt |
-| Cowork | User Preferences + global CLAUDE.md (Cowork copy) + project instructions |
+| Cowork | User Preferences + Cowork Global Instructions + project instructions |
 | Code | `~/.claude/CLAUDE.md` + project CLAUDE.md — no User Preferences |
 
 Two principles govern the whole analysis:
@@ -16,8 +17,8 @@ Two principles govern the whole analysis:
   not a defect, it is the system working as designed.
 - **The unit of comparison is the stack, not the file.** What must be
   equivalent across environments is the intent of the effective stack,
-  not the text of individual files. Two global CLAUDE.md files serving
-  different environments are not copies of one artifact.
+  not the text of individual files. The Cowork Global Instructions and the Code global CLAUDE.md serve
+  different environments and are not copies of one artifact.
 
 Estimate tokens per level with the measured method (see Context Cost
 Reference in `analysis-checks.md`) and report the total per environment.

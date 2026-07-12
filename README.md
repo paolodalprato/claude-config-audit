@@ -2,7 +2,7 @@
 
 A Claude skill that performs comprehensive audits of your Claude Desktop configuration across its three environments — Chat, Cowork, and Code: MCP servers, plugins, skills, system prompt layers, hooks, permissions, and memory files.
 
-**Current version: 2.2.0** — see the [changelog](CHANGELOG.md).
+**Current version: 2.2.1** — see the [changelog](CHANGELOG.md).
 
 ## What it does
 
@@ -45,10 +45,10 @@ The audit covers Claude Desktop and treats each of its environments as a complet
 | Layer | Chat | Cowork | Code |
 |-------|------|--------|------|
 | System instruction layer (not user-manageable) | Chat's own system-managed part | Cowork's own system-managed part | Code's own system-managed part |
-| User instruction layers | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
+| User instruction layers | User Preferences + project prompt | User Preferences + Cowork Global Instructions + project instructions | CLAUDE.md (global + project-level), no User Preferences |
 | MCP servers | claude_desktop_config.json | claude_desktop_config.json + connectors | ~/.claude.json (user scope) + .mcp.json (project) + claude_desktop_config.json |
 | Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
-| Plugins | — | Marketplace plugins | Marketplace plugins (settings.json) |
+| Plugins | Marketplace plugins | Marketplace plugins | Marketplace plugins (settings.json) |
 | Hooks / Permissions | — | — | settings.json |
 | Memory files | — | — | ~/.claude/projects/*/memory/ |
 
@@ -69,7 +69,7 @@ Above that layer sits a **system-managed part**, defined by the platform vendor 
 - **Runtime metadata** — current date, user name, workspace paths, model identifier
 - **Dynamic injections** — reminders and warnings the platform can add mid-conversation (long-conversation reminders, classifier warnings)
 
-Two practical consequences follow. **Precedence**: the system part sets the boundaries and the defaults; user layers customize within those boundaries, and in a conflict the system part wins by construction. **Observability**: the system part can only be measured from inside a session, and each environment has its own — which is why the report's footprint states which environment it measured and never guesses the others.
+Two practical consequences follow. **Precedence**: the system part sets the boundaries and the defaults. User layers customize freely within those boundaries and can override the defaults; what they cannot override are the non-negotiable boundaries, where the system part wins by construction. **Observability**: the system part can only be measured from inside a session, and each environment has its own — which is why the report's footprint states which environment it measured and never guesses the others.
 
 The system-managed part is usually the larger share of the whole prompt, often several times the user-managed layer. The audit reports its size for proportion only: it is the fixed overhead that explains why optimizing the user-managed layer is worthwhile — it is the only lever available.
 

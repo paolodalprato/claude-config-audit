@@ -3,6 +3,26 @@
 All notable changes to this skill are documented in this file. The format
 is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.1] - 2026-07-12
+
+### Fixed
+
+- **Plugins now available in Chat.** The environment matrix listed
+  plugins as Cowork/Code only; Anthropic later enabled plugins on the
+  Chat surface (their bundled skills run there, while hooks and
+  sub-agents remain Cowork/Code). Chat column corrected.
+- **Precedence wording tightened.** Clarified that user layers can
+  override the system-managed defaults; what they cannot override are
+  the non-negotiable boundaries, where the system part wins by
+  construction. The previous phrasing implied the system wins on
+  everything, including the defaults users routinely override.
+- **Cowork instruction terminology corrected.** The Cowork global
+  instruction layer is the Global Instructions field (Settings →
+  Cowork), not a CLAUDE.md file. Updated the environment matrix and
+  `reference/hierarchy-checks.md` (stack table, instruction-sources
+  line, stack-equivalence example) accordingly. CLAUDE.md files remain
+  the Code mechanism.
+
 ## [2.2.0] - 2026-07-11
 
 ### Changed
