@@ -72,8 +72,10 @@
 <body>
 <header>
   <h1>{{TITLE}}</h1>
-  <div class="meta">{{DATE}} · <span class="badge">{{PLATFORM_DETECTED}}</span>
-    {{PLATFORMS_ANALYZED_LABEL}}: {{PLATFORMS_ANALYZED}}</div>
+  <!-- AUDIT_ENVIRONMENT = the environment the auditing session ran in;
+       ENVIRONMENTS_ANALYZED = the environments the audit covered. -->
+  <div class="meta">{{DATE}} · <span class="badge">{{AUDIT_ENVIRONMENT}}</span>
+    {{ENVIRONMENTS_ANALYZED_LABEL}}: {{ENVIRONMENTS_ANALYZED}}</div>
 </header>
 <nav id="tabs">
   <button data-tab="overview" class="active">{{TAB_OVERVIEW}}</button>
@@ -116,11 +118,15 @@
     {{CROSS_CONTENT}}
   </section>
   <section class="tab" id="tab-plan">
-    <!-- Intervention plan table: # | intervention | layer | why |
+    <!-- Intervention plan table: # | intervention | where | why |
          difficulty (pill: ok=low, warn=medium, bad=high) | expected
          impact | decision needed. Quick wins first. Include the
          difficulty scale legend as a .note paragraph. -->
     {{PLAN_CONTENT}}
+    <!-- Questions for the user (last section of the markdown report):
+         numbered list of decisions needing input, under a translated
+         heading. They stay in this tab — decisions belong with the plan. -->
+    {{QUESTIONS_CONTENT}}
   </section>
 </main>
 <script>
@@ -134,6 +140,13 @@
       s.classList.toggle('active', s.id === 'tab-' + btn.dataset.tab));
   });
   // Sortable tables: click a header to sort (numeric when possible).
+  // toNum handles localized figures: separators followed by 3-digit
+  // groups are thousands separators ("1.200", "12,500"), a remaining
+  // comma is a decimal comma ("12,5").
+  const toNum = s => {
+    s = s.replace(/[^\d.,-]/g, '').replace(/[.,](?=\d{3}([.,]|$))/g, '');
+    return parseFloat(s.replace(',', '.'));
+  };
   document.querySelectorAll('th').forEach(th => th.addEventListener('click', () => {
     const table = th.closest('table'), tbody = table.tBodies[0];
     if (!tbody) return;
@@ -142,8 +155,7 @@
     const rows = [...tbody.rows].sort((a, b) => {
       const x = (a.cells[i]?.innerText ?? '').trim();
       const y = (b.cells[i]?.innerText ?? '').trim();
-      const nx = parseFloat(x.replace(/[^\d.,-]/g, '').replace(',', '.'));
-      const ny = parseFloat(y.replace(/[^\d.,-]/g, '').replace(',', '.'));
+      const nx = toNum(x), ny = toNum(y);
       const cmp = (!isNaN(nx) && !isNaN(ny)) ? nx - ny : x.localeCompare(y);
       return dir === 'asc' ? cmp : -cmp;
     });

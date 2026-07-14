@@ -72,23 +72,27 @@ deferred, or assumed.]
 
 **Stack received**: User Preferences + active project prompt
 **MCP servers loaded**: [from claude_desktop_config.json]
-**Skills**: [account-level skills]
+**Skills and plugins**: [account-level skills + plugin skills]
 
 ### Issues in this environment
-[Duplicates inside this environment, context cost, unused elements]
+[Within-stack hierarchy findings first — same-file contradictions, then
+misplaced rules (see hierarchy-checks.md) — then duplicates inside this
+environment, context cost, unused elements]
 
 ---
 
 ## 3. Environment: Cowork
 
-**Stack received**: User Preferences + global CLAUDE.md + project instructions
+**Stack received**: User Preferences + Cowork Global Instructions + project instructions
 **MCP servers / connectors loaded**: [claude_desktop_config.json + connectors]
 **Skills and plugins**: [local skills, plugin skills, marketplace plugins]
 **Context cost**: [measured — typically the environment where bundles
 and tool schemas weigh most]
 
 ### Issues in this environment
-[Duplicates inside this environment, context cost, unused elements]
+[Within-stack hierarchy findings first — same-file contradictions, then
+misplaced rules (see hierarchy-checks.md) — then duplicates inside this
+environment, context cost, unused elements]
 
 ---
 
@@ -100,21 +104,26 @@ and tool schemas weigh most]
 **Memory files**: [~/.claude/projects/*/memory/]
 
 ### Issues in this environment
-[Duplicates inside this environment, unused plugins, hooks and
-permissions concerns, memory hygiene]
+[Within-stack hierarchy findings first — same-file contradictions, then
+misplaced rules — then duplicates inside this environment, unused
+plugins, hooks and permissions concerns, memory hygiene]
 
 ---
 
 ## 5. Cross-Environment Checks
 
-### Stack equivalence and compensation
-[Differences that compensate a missing level are declared compensation,
-not drift. Drift is divergence in the shared core after subtracting
-compensations. See hierarchy-checks.md.]
+[Ordering: coverage gaps first (behavioral risk), then drift, then the
+override map (information only). If a non-file layer could not be
+collected, say which findings are partial. See hierarchy-checks.md.]
 
 ### Coverage gaps
 [Rules present in one environment's stack, absent where they would
 apply equally, with no compensation in place]
+
+### Stack equivalence and compensation
+[Differences that compensate a missing level are declared compensation,
+not drift. Drift is divergence in the shared core after subtracting
+compensations.]
 
 ### Override map
 | General rule | Overridden where | Declared? |
@@ -133,6 +142,10 @@ apply equally, with no compensation in place]
 | Context cost (state method per figure) | | | |
 | Skills visible | | | |
 | Plugins enabled | | | |
+
+[Chat and Cowork load the same server processes from
+claude_desktop_config.json: mark them as shared and never sum RAM
+across environment columns — the machine pays each process once.]
 
 ---
 

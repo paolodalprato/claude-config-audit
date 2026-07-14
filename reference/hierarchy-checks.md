@@ -23,6 +23,12 @@ Two principles govern the whole analysis:
 Estimate tokens per level with the measured method (see Context Cost
 Reference in `analysis-checks.md`) and report the total per environment.
 
+User Preferences and the Cowork Global Instructions are not files on
+disk: if a layer could not be collected (see the non-file layers note
+in Phase 1 of SKILL.md), analyze the layers available and mark every
+cross-stack conclusion involving the missing layer as partial — never
+reconstruct its content by inference.
+
 ## The rewrite test
 
 The discriminator between conflict and specialization. Take the general
@@ -111,8 +117,11 @@ declared override is the healthiest pattern in the whole hierarchy;
 when a recurring override is undeclared, suggest declaring it in the
 general rule.
 
-## Ordering in the report
+## Where findings go in the report
 
-Report hierarchy results in this order: contradictions and coverage
-gaps first (behavioral risk), then drift (silent divergence over time),
-then misplacement (cost), then the override map (information only).
+Within-stack findings belong to the section of the environment that
+pays them ("Issues in this environment"): same-file contradictions
+first (behavioral risk), then misplacement (cost). Cross-stack findings
+belong to the cross-environment section, in this order: coverage gaps
+first (behavioral risk), then drift (silent divergence over time), then
+the override map (information only).

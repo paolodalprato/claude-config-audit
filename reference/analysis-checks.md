@@ -24,7 +24,7 @@ Servers that provide web search capabilities:
 - `exa`
 - `serpapi`
 
-In Cowork and Claude Desktop, the native `WebSearch` tool is built-in and
+In Chat and Cowork, the native `WebSearch` tool is built-in and
 requires no configuration. External search MCP servers add value only if
 they provide features WebSearch doesn't: page crawling, news filtering by
 source, trending topics, sitemap extraction.

@@ -3,6 +3,64 @@
 All notable changes to this skill are documented in this file. The format
 is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.2.2] - 2026-07-14
+
+### Fixed
+
+- **The 2.2.1 corrections now reach the operative files.** The v2.2.1
+  fixes (plugins available in Chat, "Cowork Global Instructions"
+  terminology) had been applied to README.md and
+  `reference/hierarchy-checks.md` only: the environment matrix in
+  SKILL.md and the Cowork section of the report template still carried
+  the stale statements — and those are the files the model executes,
+  so generated reports repeated them. Both aligned; the frontmatter
+  version now tracks releases again.
+- **Numeric sorting in the HTML report handles localized figures.**
+  The column sort parsed "1.200" (Italian thousands) and "1,200"
+  (English thousands) as 1.2, misordering token and RAM columns.
+  Thousands separators are now stripped before comparison; a remaining
+  comma is treated as a decimal comma.
+- **User questions reach the HTML report.** The markdown report closes
+  with "Questions for You", but the HTML template had no slot for it:
+  the plan tab now includes a `{{QUESTIONS_CONTENT}}` placeholder.
+- **Hierarchy findings have a declared home in the report.**
+  `hierarchy-checks.md` prescribed one ordering that mixed within-stack
+  findings (same-file contradictions, misplacement) with cross-stack
+  ones (coverage gaps, drift), while the template only had slots for
+  the latter. Now: within-stack findings open each environment's
+  issues section; cross-stack findings live in the cross-environment
+  section, coverage gaps first, then drift, then the override map.
+- **RAM is no longer summable across environments.** Chat and Cowork
+  load the same server processes from claude_desktop_config.json; the
+  Resource Impact Summary now marks them as shared — the machine pays
+  each process once.
+- Unused-skill detection reworded: usage is not observable from
+  configuration alone, so apparent non-use is a candidate to confirm
+  in Phase 4 validation, never a standalone finding.
+- Token estimation in SKILL.md now states the ÷ 3 divisor for
+  non-English Latin-alphabet text (previously only in the Context Cost
+  Reference), avoiding a ~33% overestimate on e.g. Italian instruction
+  files.
+- Renamed the leftover `{{PLATFORM*}}` placeholders in the HTML
+  template to environment terminology (`{{AUDIT_ENVIRONMENT}}`,
+  `{{ENVIRONMENTS_ANALYZED}}`); "In Cowork and Claude Desktop" → "In
+  Chat and Cowork" in `analysis-checks.md`.
+
+### Added
+
+- **Non-file instruction layers** (Phase 1): User Preferences and the
+  Cowork Global Instructions are not files on disk and are observable
+  only from a session of their own environment. When auditing from
+  elsewhere (typically Code), ask the user to paste them; if
+  unavailable, the hierarchy analysis runs on the layers present and
+  marks its cross-environment findings as partial.
+- **Chat and Cowork memory acknowledged.** The environment matrix no
+  longer claims memory is Code-only: Chat feeds a shared project
+  memory that Cowork mounts read-only next to its own `.auto-memory/`
+  directory. The file-level memory checks remain Code-only (project
+  workspace memory is reachable only from a session in that project),
+  and the report must state this scope limit.
+
 ## [2.2.1] - 2026-07-12
 
 ### Fixed

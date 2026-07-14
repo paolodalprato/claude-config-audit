@@ -2,7 +2,7 @@
 
 A Claude skill that performs comprehensive audits of your Claude Desktop configuration across its three environments — Chat, Cowork, and Code: MCP servers, plugins, skills, system prompt layers, hooks, permissions, and memory files.
 
-**Current version: 2.2.1** — see the [changelog](CHANGELOG.md).
+**Current version: 2.2.2** — see the [changelog](CHANGELOG.md).
 
 ## What it does
 
@@ -50,7 +50,7 @@ The audit covers Claude Desktop and treats each of its environments as a complet
 | Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
 | Plugins | Marketplace plugins | Marketplace plugins | Marketplace plugins (settings.json) |
 | Hooks / Permissions | — | — | settings.json |
-| Memory files | — | — | ~/.claude/projects/*/memory/ |
+| Memory files | Project memory, fed automatically | Shared project memory (read-only) + `.auto-memory/` per project | ~/.claude/projects/*/memory/ |
 
 Every layer below the first is user-managed. The system instruction layer — product identity, behavior policies, built-in tool instructions and schemas, runtime metadata — is specific to each environment and is described in the next section: the report measures it for proportion, but it cannot be audited or configured.
 

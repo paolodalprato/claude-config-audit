@@ -1,6 +1,6 @@
 ---
 name: claude-config-audit
-version: 2.2.0
+version: 2.2.2
 description: >
   Comprehensive audit and optimization of your Claude Desktop
   configuration across its three environments — Chat, Cowork, and Code:
@@ -66,12 +66,12 @@ a complete stack — what a session there actually receives:
 | Layer | Chat | Cowork | Code |
 |-------|------|--------|------|
 | System instruction layer (not user-manageable) | Chat's own system-managed part | Cowork's own system-managed part | Code's own system-managed part |
-| User instruction layers | User Preferences + project prompt | User Preferences + global CLAUDE.md + project instructions | CLAUDE.md (global + project-level), no User Preferences |
+| User instruction layers | User Preferences + project prompt | User Preferences + Cowork Global Instructions + project instructions | CLAUDE.md (global + project-level), no User Preferences |
 | MCP servers | claude_desktop_config.json | claude_desktop_config.json + connectors | ~/.claude.json (user scope) + .mcp.json (project) + claude_desktop_config.json |
 | Skills | Account-level skills | Local + plugin skills | Local + plugin skills |
-| Plugins | — | Marketplace plugins | Marketplace plugins (settings.json) |
+| Plugins | Marketplace plugins | Marketplace plugins | Marketplace plugins (settings.json) |
 | Hooks / Permissions | — | — | settings.json |
-| Memory files | — | — | ~/.claude/projects/*/memory/ |
+| Memory files | Project memory, fed automatically | Shared project memory (read-only) + `.auto-memory/` per project | ~/.claude/projects/*/memory/ |
 
 Every layer below the first is user-managed. The system instruction
 layer (product identity, behavior policies, built-in tool instructions
@@ -111,6 +111,14 @@ possible in parallel to save time.
 - Deferred tools list → reveals all active MCP servers and connectors
 - Available skills list → reveals all loaded skills with their sources
 - System prompt content → reveals User Preferences and CLAUDE.md as injected
+
+**Non-file instruction layers**: User Preferences and the Cowork Global
+Instructions are not files on disk — each is observable only from the
+session context of its own environment. When the audit runs elsewhere
+(typically Code), ask the user to paste them. If they remain
+unavailable, run the hierarchy analysis on the layers you have and mark
+its cross-environment findings as partial in the report, naming the
+missing layer.
 
 **What to collect for each layer:**
 
@@ -164,7 +172,9 @@ equivalence, compensation, coverage gaps) come last.
 
 **Unused element detection:**
 - MCP servers that require external services not running (Docker, Ollama, GIMP)
-- Skills with no evidence of use (no output files, never mentioned in history)
+- Skills that appear unused — usage is not observable from configuration
+  alone, so treat these as candidates to confirm with the user in
+  Phase 4, never as standalone findings
 - Setup/onboarding plugins still active after initial configuration
 - API-based services with expired credentials or exhausted quotas
 
@@ -185,7 +195,8 @@ equivalence, compensation, coverage gaps) come last.
 **Context cost assessment:**
 - Measure the tokens injected per session from what is actually visible
   in the session context: characters of tool schemas, skill descriptions,
-  and server instruction blocks, divided by 4. Fall back to count-based
+  and server instruction blocks, divided by 4 (÷ 3 for non-English
+  Latin-alphabet text, e.g. Italian instruction files). Fall back to count-based
   ranges only for servers not loaded in the session, labeled as assumptions
 - Measure the total system prompt of the auditing session and split it:
   system-managed part (product and tool instructions, tool schemas,
@@ -250,6 +261,12 @@ equivalence, compensation, coverage gaps) come last.
 - Project memory directories for projects that no longer exist on disk
 - MEMORY.md exceeding the load limit — only the first 200 lines or 25 KB,
   whichever comes first, are loaded into context
+
+Chat and Cowork projects have memory too (Chat feeds a shared project
+memory that Cowork mounts read-only next to its own `.auto-memory/`
+directory), but it lives inside each project workspace and is reachable
+only from a session in that project: the file-level checks above cover
+Code only — state this scope limit in the report when discussing memory.
 
 ### Phase 3: Report
 
